@@ -1,0 +1,550 @@
+openapi: 3.0.3
+info:
+  title: ERP REST API
+  version: 0.1.0
+paths:
+  /ping:
+    get:
+      summary: Alive check
+      description: When system is alive, returns "pong"
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: pong
+      tags:
+        - operation
+
+  /v1/invoices/{paymentReferenceId}:
+    parameters:
+      - name: paymentReferenceId
+        in: path
+        description: Variable symbol
+        required: true
+        content: 
+          text/plain:
+              schema:
+                type: integer
+                example: 412354654
+      - name: type
+        in: query
+        description: Decision of invoice type - default value "invoice"
+        schema: 
+          type: string
+          enum:
+            - proforma
+            - invoice
+          default: invoice
+        required: false
+      
+
+    head:
+      responses:
+        200:
+          description: Successful Response
+        404:
+          description: Invoice not found
+      summary: Checks existence of generated invoice in PDF
+      description: Returns no body content, only checks existence of invoice
+      tags:
+       - invoices
+       
+    get:
+      summary: Download invoice data
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Invoice'
+
+        404:
+          description: Invoice not found
+
+      tags:
+        - invoices
+  
+  /v1/invoices/{paymentReferenceId}/pdf:
+    parameters:
+      - name: paymentReferenceId
+        in: path
+        description: Variable symbol
+        required: true
+        content: 
+          text/plain:
+              schema:
+                type: integer
+                example: 412354654
+  
+      
+    get:
+      summary: Download invoice data with PDF
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/InvoicePDF'
+
+        404:
+          description: Invoice not found
+      tags:
+        - invoices
+  
+    
+
+  /v1/invoices:
+    get:
+      summary: Filter invoices, return invoice data
+      parameters:
+      - name: customerId
+        in: query
+        description: GUID from ERP
+        schema: 
+          type: string
+          example: '028e12d1-be7a-4913-b797-7e848c4e4977'
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema: 
+                type: array
+                items:
+                  $ref: '#/components/schemas/Invoice'
+        404:
+          description: Customer id not found
+            
+      tags:
+        - invoices
+
+    post:
+      summary: Creates new invoice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                paymentReferenceId:
+                  type: integer
+                  description: "Variable symbol"
+                  example: 120004565
+                currency:
+                  description: Three letter currency code by  ISO 4217 
+                  type: string
+                  example: CZK
+                type: 
+                  type: string
+                  description: Decision of proforma/invoice
+                  enum:
+                  - proforma
+                  - invoice
+                  example: invoice
+                customerId:: 
+                  type: string
+                  format: uuid
+                  description: GUID from ERP
+                  example: '028e12d1-be7a-4913-b797-7e848c4e4977'
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      text:
+                        type: string
+                        example: Dobití kreditu do PPC systému Heureka.cz
+                      amount:
+                        type: string
+                        format: Decimal
+                        description: Price without VAT
+                        example: "10.50"
+
+                        
+
+      responses:
+        200:
+          description: Successful Response
+        412:
+          description: "Validation failed"  
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ErrorValidation'
+      tags:
+         - invoices
+
+ 
+
+  
+  /v1/customers:
+    get:
+      summary: Get customers from ERP
+      parameters:
+      - name: identificationNumber
+        in: query
+        description: identificationNumber IC
+        schema: 
+          type: string
+          example: '123456789'
+      
+      responses:
+          200:
+            description: Successful Response
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                      $ref: '#/components/schemas/Customer'
+      tags:
+       - customers
+       
+    post:
+      summary: Create customer in ERP
+      requestBody:
+        description: Optional description in *Markdown*
+        required: true
+        content:
+          application/json:
+            schema: 
+                $ref: '#/components/schemas/Customer'
+                
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema: 
+                allOf:
+                  - $ref: '#/components/schemas/Customer'
+                  - type: object
+                    properties:
+                      customerId: 
+                        type: string
+                        format: uuid
+                        description: ERP guid
+                        example: 67f65327-6ff5-4d2d-a967-7987773dbc5b
+        412:
+          description: "Validation failed"  
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ErrorValidation'
+        
+      tags:
+       - customers
+  
+  /v1/customers/{customerId}:
+    get:
+      summary: Get one customer from ERP
+      parameters:
+      - name: customerId
+        in: path
+        description: ERP guid
+        schema: 
+          type: string
+          format: uuid
+          example: 67f65327-6ff5-4d2d-a967-7987773dbc5b
+        required: true
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema: 
+                allOf:
+                  - $ref: '#/components/schemas/Customer'
+                  - type: object
+                    properties:
+                      customerId: 
+                        type: string
+                        format: uuid
+                        description: ERP guid
+                        example: 67f65327-6ff5-4d2d-a967-7987773dbc5b
+        404:
+          description: Customer not found
+      tags:
+       - customers
+    
+    put:
+      summary: Update customer in ERP
+      parameters:
+      - name: customerId
+        in: path
+        description: ERP guid
+        schema: 
+          type: string
+          format: uuid
+          example: 67f65327-6ff5-4d2d-a967-7987773dbc5b
+        required: true
+      requestBody:
+        description: All fields are optional.
+        required: true
+        content:
+          application/json:
+            schema: 
+                $ref: '#/components/schemas/Customer'
+                
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema: 
+                allOf:
+                  - $ref: '#/components/schemas/Customer'
+                  - type: object
+                    properties:
+                      customerId: 
+                        type: string
+                        format: uuid
+                        description: ERP guid
+                        example: 67f65327-6ff5-4d2d-a967-7987773dbc5b
+        412:
+          description: "Validation failed"  
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ErrorValidation' 
+      tags:
+       - customers
+       
+  /v1/customers/{customerId}/vat:
+    description: Used before any inoice created
+    parameters:
+      - name: customerId
+        in: path
+        description: ERP guid
+        schema: 
+          type: string
+          format: uuid
+          example: 67f65327-6ff5-4d2d-a967-7987773dbc5b
+        required: true
+ 
+    get:
+      summary: Returns VAT and amount with VAT based on customer settings
+      parameters:
+      - name: amount
+        in: query
+        required: true
+        description: Amount without VAT (Decimal)
+        schema: 
+          type: string
+          example: '10.50'
+      - name: currency
+        in: query
+        required: true
+        description: Three letter currency code by  ISO 4217 
+        schema:
+          type: string
+          example: CZK
+
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/VAT'
+        412:
+          description: "Validation failed"  
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ErrorValidation'
+      tags:
+         - customers
+
+
+components:
+  schemas:
+    Customer:
+      type: object
+      required:
+        - name
+        - identificationNumber
+        - isVatPayer
+        - street
+        - city
+        - postCode
+        - country
+        - email
+      properties:
+        name: 
+          type: string
+          description: Name of the customers company.
+          example: Prvni vzduchoplavecka a.s.
+        identificationNumber:
+          description: Identification number of the customer (IČO)
+          type: string
+          example: "123456789"
+        vatNumber:
+          description: VAT number of the customer (DIČ).
+          type: string
+          example: "10000001"
+        vatIdentificationNumber:
+          description: Slovak IC DIC
+          type: string
+          example: "10000001"
+        isVatPayer:
+          type: boolean
+          description: Whether the customer is a VAT payer or not.
+          example: true
+        street:
+          description: Street from the customers address.
+          type: string
+          example: U plynojemu 69
+        city:
+          description: City from the customers address.
+          type: string
+          example: Pardubice
+        postCode:
+          description: Post code from the customers address.
+          type: string
+          example: "32000"
+        country:
+          description: Code of country from the customers address - ISO 3166-1 alpha-2.
+          format: countryCode
+          type: string
+          example: cz
+        telephone:
+          description: Customers telephone number with country prefix.
+          format: phone
+          type: string
+          example: "+420605413742"
+        email:
+          description: Customers e-mail address
+          type: string
+          format: email
+          example: kapitan@vzduchoplavecka.cz
+          
+    Invoice:
+      type: object
+      required:
+        - amount
+        - amountVat
+        - createdDate
+        - dueDate
+        - items
+        - purpose
+        - currency
+        - paymentReferenceId
+      properties:
+        paymentReferenceId:
+          description: "Variable symbol"
+          type: integer
+          example: 120004565
+        currency: 
+          type: string
+          description: Three letter currency code by  ISO 4217 
+          example: CZK
+        amount:
+          type: string
+          format: Decimal
+          description: Price without VAT
+          example: "10.50"
+        amountVat:
+          type: string
+          format: Decimal
+          description: Price with VAT
+          example: "12.50"
+        purpose: 
+          type: string
+          description: Who created invoice service
+          enum:
+            - autopay
+            - manual
+        createdDate:
+          type: string
+          format: date
+          description: "Date (datum vytvoreni) ISO 8601"
+          example: '2012-04-23T18:25:43.511Z'
+        dueDate:
+          type: string
+          format: date
+          description: "Date (termin splatnosti) ISO 8601 "
+          example: '2012-04-23T18:25:43.511Z'
+        items:
+          description: 'Item from invoice'
+          type: array
+          items:
+            type: object
+            properties:
+              text:
+                type: string
+                example: Dobití kreditu do PPC systému Heureka.cz
+              amount:
+                type: string
+                format: Decimal
+                description: Price without VAT
+                example: "10.50"
+    InvoicePDF:
+      allOf:
+      - $ref: '#/components/schemas/Invoice'
+      - type: object
+        required:
+          - pdf
+        properties:
+            pdf: 
+              type: string
+              format: byte
+              description: Base64-encoded contents invoice PDF
+              example: UERG
+      
+    VAT:
+      type: object
+      required:
+        - amount
+        - amountVat
+        - vat
+        - currency
+      properties:
+        amount:
+          type: string
+          example: '10.50'
+          format: Decimal
+          description: "Price without VAT"
+        amountVat:
+          type: string
+          example: '11.80'
+          format: Decimal
+          description: "Price with VAT"
+        vat:
+          type: string
+          format: Decimal
+          example: '1.30'
+          description: "VAT value"
+        currency: 
+          type: string
+          description: Three letter currency code by  ISO 4217 
+          example: CZK
+          
+    ErrorValidation:
+      type: array
+      items:
+        type: object
+        required:
+            - field
+            - description
+        properties:
+          field:
+            type: string
+            description: Name of invalid field 
+            example: email
+          description: 
+            type: string
+            description: Error description
+            example: 'Email is invalid'
+          value: 
+            type: string
+            description: Value of field
+            example: 'vzduchoplavec(a)vzduchoplavecka.cz'
+      
+    
