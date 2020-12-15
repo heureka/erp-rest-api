@@ -329,6 +329,7 @@ paths:
         required: true
  
     get:
+      deprecated: true,
       summary: Returns VAT and amount with VAT based on customer settings
       parameters:
       - name: amount
@@ -409,11 +410,11 @@ components:
           description: Post code from the customers address.
           type: string
           example: "32000"
-        country:
-          description: Code of country from the customers address - ISO 3166-1 alpha-2.
+        countryCode:
+          description: Code of country from the customers address - ISO 3166-1 alpha-3 - uppercase.
           format: countryCode
           type: string
-          example: cz
+          example: CZE
         telephone:
           description: Customers telephone number with country prefix.
           format: phone
