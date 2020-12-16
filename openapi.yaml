@@ -129,48 +129,18 @@ paths:
         required: true
         content:
           application/json:
-            schema:
-              type: object
-              properties:
-                paymentReferenceId:
-                  type: integer
-                  description: "Variable symbol"
-                  example: 120004565
-                currency:
-                  description: Three letter currency code by  ISO 4217 
-                  type: string
-                  example: CZK
-                type: 
-                  type: string
-                  description: Decision of proforma/invoice
-                  enum:
-                  - proforma
-                  - invoice
-                  example: invoice
-                customerId:: 
-                  type: string
-                  format: uuid
-                  description: GUID from ERP
-                  example: '028e12d1-be7a-4913-b797-7e848c4e4977'
-                items:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      text:
-                        type: string
-                        example: Dobití kreditu do PPC systému Heureka.cz
-                      amount:
-                        type: string
-                        format: Decimal
-                        description: Price without VAT
-                        example: "10.50"
+            schema: 
+                $ref: '#/components/schemas/InvoiceInput'
 
                         
 
       responses:
         200:
-          description: Successful Response
+          description: Invoice created
+          content:
+              application/json:
+                schema: 
+                  $ref: '#/components/schemas/Invoice'
         412:
           description: "Validation failed"  
           content:
@@ -214,7 +184,7 @@ paths:
         content:
           application/json:
             schema: 
-                $ref: '#/components/schemas/Customer'
+                $ref: '#/components/schemas/CustomerInput'
                 
       responses:
         200:
@@ -315,57 +285,11 @@ paths:
                 $ref: '#/components/schemas/ErrorValidation' 
       tags:
        - customers
-       
-  /v1/customers/{customerId}/vat:
-    description: Used before any inoice created
-    parameters:
-      - name: customerId
-        in: path
-        description: ERP guid
-        schema: 
-          type: string
-          format: uuid
-          example: 67f65327-6ff5-4d2d-a967-7987773dbc5b
-        required: true
- 
-    get:
-      summary: Returns VAT and amount with VAT based on customer settings
-      parameters:
-      - name: amount
-        in: query
-        required: true
-        description: Amount without VAT (Decimal)
-        schema: 
-          type: string
-          example: '10.50'
-      - name: currency
-        in: query
-        required: true
-        description: Three letter currency code by  ISO 4217 
-        schema:
-          type: string
-          example: CZK
-
-      responses:
-        200:
-          description: Successful Response
-          content:
-            application/json:
-              schema: 
-                $ref: '#/components/schemas/VAT'
-        412:
-          description: "Validation failed"  
-          content:
-            application/json:
-              schema: 
-                $ref: '#/components/schemas/ErrorValidation'
-      tags:
-         - customers
 
 
 components:
   schemas:
-    Customer:
+    CustomerInput:
       type: object
       required:
         - name
@@ -374,13 +298,18 @@ components:
         - street
         - city
         - postCode
-        - country
+        - countryCode
         - email
+        - customerId
       properties:
         name: 
           type: string
           description: Name of the customers company.
           example: Prvni vzduchoplavecka a.s.
+        isActive:
+          type: boolean
+          description: When customer is manual checked -> marked as true
+          example: true
         identificationNumber:
           description: Identification number of the customer (IČO)
           type: string
@@ -409,11 +338,11 @@ components:
           description: Post code from the customers address.
           type: string
           example: "32000"
-        country:
-          description: Code of country from the customers address - ISO 3166-1 alpha-2.
+        countryCode:
+          description: Code of country from the customers address - ISO 3166-1 alpha-3 - uppercase.
           format: countryCode
           type: string
-          example: cz
+          example: CZE
         telephone:
           description: Customers telephone number with country prefix.
           format: phone
@@ -425,66 +354,110 @@ components:
           format: email
           example: kapitan@vzduchoplavecka.cz
           
-    Invoice:
-      type: object
-      required:
-        - amount
-        - amountVat
-        - createdDate
-        - dueDate
-        - items
-        - purpose
-        - currency
-        - paymentReferenceId
-      properties:
-        paymentReferenceId:
-          description: "Variable symbol"
-          type: integer
-          example: 120004565
-        currency: 
-          type: string
-          description: Three letter currency code by  ISO 4217 
-          example: CZK
-        amount:
-          type: string
-          format: Decimal
-          description: Price without VAT
-          example: "10.50"
-        amountVat:
-          type: string
-          format: Decimal
-          description: Price with VAT
-          example: "12.50"
-        purpose: 
-          type: string
-          description: Who created invoice service
-          enum:
-            - autopay
-            - manual
-        createdDate:
-          type: string
-          format: date
-          description: "Date (datum vytvoreni) ISO 8601"
-          example: '2012-04-23T18:25:43.511Z'
-        dueDate:
-          type: string
-          format: date
-          description: "Date (termin splatnosti) ISO 8601 "
-          example: '2012-04-23T18:25:43.511Z'
-        items:
-          description: 'Item from invoice'
-          type: array
+    Customer:
+     allOf:
+      - $ref: '#/components/schemas/CustomerInput'
+      - type: object
+        properties:
+          customerId: 
+            type: string
+            format: uuid
+            description: ERP guid
+            example: 67f65327-6ff5-4d2d-a967-7987773dbc5b
+          
+              
+    InvoiceInput:
+        type: object
+        required:
+          - paymentReferenceId
+          - currency
+          - countryCode
+          - type
+          - customerId
+          - items
+        properties:
+          paymentReferenceId:
+            type: integer
+            description: "Variable symbol"
+            example: 120004565
+          currency:
+            description: Three letter currency code by  ISO 4217 
+            type: string
+            example: CZK
+          countryCode:
+            description: Code of country - ISO 3166-1 alpha-3 - uppercase.
+            format: countryCode
+            type: string
+            example: CZE
+          type: 
+            type: string
+            description: Payment source
+            enum:
+              - autopay
+              - manual
+              - paybylink
+              - banktransfer
+              - backwardinvoicing
+              - shoppingcard
+            example: autopay
+          customerId:
+            type: string
+            format: uuid
+            description: GUID from ERP
+            example: '028e12d1-be7a-4913-b797-7e848c4e4977'
           items:
-            type: object
-            properties:
-              text:
-                type: string
-                example: Dobití kreditu do PPC systému Heureka.cz
-              amount:
-                type: string
-                format: Decimal
-                description: Price without VAT
-                example: "10.50"
+            type: array
+            items:
+              type: object
+              properties:
+                text:
+                  type: string
+                  example: Dobití kreditu do PPC systému Heureka.cz
+                amount:
+                  type: string
+                  format: Decimal
+                  description: Price without VAT
+                  example: "10.50"
+      
+    Invoice:
+      allOf:
+      - $ref: '#/components/schemas/InvoiceInput'
+      - type: object
+        required:
+          - amount
+          - amountVat
+          - status
+          - createdDate
+          - dueDate
+        properties:
+          amount:
+            type: string
+            format: Decimal
+            description: Price without VAT
+            example: "10.50"
+          amountVat:
+            type: string
+            format: Decimal
+            description: Price with VAT
+            example: "12.50"
+          status:
+            type: string
+            description: Invoice payment status
+            enum:
+              - paid
+              - partially
+              - unpaid
+          createdDate:
+            type: string
+            format: date
+            description: "Date (datum vytvoreni) ISO 8601"
+            example: '2012-04-23T18:25:43.511Z'
+          dueDate:
+            type: string
+            format: date
+            description: "Date (termin splatnosti) ISO 8601"
+            example: '2012-04-23T18:25:43.511Z'
+
     InvoicePDF:
       allOf:
       - $ref: '#/components/schemas/Invoice'
@@ -498,33 +471,6 @@ components:
               description: Base64-encoded contents invoice PDF
               example: UERG
       
-    VAT:
-      type: object
-      required:
-        - amount
-        - amountVat
-        - vat
-        - currency
-      properties:
-        amount:
-          type: string
-          example: '10.50'
-          format: Decimal
-          description: "Price without VAT"
-        amountVat:
-          type: string
-          example: '11.80'
-          format: Decimal
-          description: "Price with VAT"
-        vat:
-          type: string
-          format: Decimal
-          example: '1.30'
-          description: "VAT value"
-        currency: 
-          type: string
-          description: Three letter currency code by  ISO 4217 
-          example: CZK
           
     ErrorValidation:
       type: array
@@ -546,5 +492,4 @@ components:
             type: string
             description: Value of field
             example: 'vzduchoplavec(a)vzduchoplavecka.cz'
-      
-    
+
