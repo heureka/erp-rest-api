@@ -3,8 +3,8 @@ info:
   title: ERP REST API
   version: 0.1.0
 paths:
-  /ping:
-    get:
+  /api/services/v1/Getping:
+    post:
       summary: Alive check
       description: When system is alive, returns "pong"
       responses:
@@ -17,42 +17,34 @@ paths:
                 example: pong
       tags:
         - operation
-
-  /v1/invoices/{paymentReferenceId}:
-    parameters:
-      - name: paymentReferenceId
-        in: path
-        description: Variable symbol
-        required: true
-        content: 
-          text/plain:
-              schema:
-                type: integer
-                example: 412354654
-      - name: type
-        in: query
-        description: Decision of invoice type - default value "invoice"
-        schema: 
-          type: string
-          enum:
-            - proforma
-            - invoice
-          default: invoice
-        required: false
       
-
-    head:
+  /api/services/v1/Checkinvoiceinpdf:
+    post:
+      summary: Checks existence of generated invoice in PDF
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/PaymentReference'
       responses:
         200:
           description: Successful Response
         404:
           description: Invoice not found
-      summary: Checks existence of generated invoice in PDF
       description: Returns no body content, only checks existence of invoice
       tags:
        - invoices
        
-    get:
+
+  /api/services/v1/Getinvoicedata:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/PaymentReference'
       summary: Download invoice data
       responses:
         200:
@@ -68,20 +60,14 @@ paths:
       tags:
         - invoices
   
-  /v1/invoices/{paymentReferenceId}/pdf:
-    parameters:
-      - name: paymentReferenceId
-        in: path
-        description: Variable symbol
+  /api/services/v1/Getinvoicedatapdf:
+    post:
+      requestBody:
         required: true
-        content: 
-          text/plain:
-              schema:
-                type: integer
-                example: 412354654
-  
-      
-    get:
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/PaymentReference'
       summary: Download invoice data with PDF
       responses:
         200:
@@ -98,16 +84,15 @@ paths:
   
     
 
-  /v1/invoices:
-    get:
+  /api/services/v1/Getcustomerinvoice:
+    post:
       summary: Filter invoices, return invoice data
-      parameters:
-      - name: customerId
-        in: query
-        description: GUID from ERP
-        schema: 
-          type: string
-          example: '028e12d1-be7a-4913-b797-7e848c4e4977'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/CustomerId'
       responses:
         200:
           description: Successful Response
@@ -123,6 +108,7 @@ paths:
       tags:
         - invoices
 
+  /api/services/v1/createInvoice:
     post:
       summary: Creates new invoice
       requestBody:
@@ -492,4 +478,27 @@ components:
             type: string
             description: Value of field
             example: 'vzduchoplavec(a)vzduchoplavecka.cz'
-
+            
+    
+    PaymentReference:
+      allOf:
+      - type: object
+        required:
+          - paymentReferenceId
+        properties:
+          paymentReferenceId:
+            type: integer
+            description: Variable symbol
+            example: 412354654
+            
+    CustomerId:
+      allOf:
+      - type: object
+        required:
+          - customerId
+        properties:
+          customerId:
+            type: string
+            format: uuid
+            example: '028e12d1-be7a-4913-b797-7e848c4e4977'
+            description: GUID from ERP
