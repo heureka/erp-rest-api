@@ -3,7 +3,7 @@ info:
   title: ERP REST API
   version: 0.1.0
 paths:
-  /ping:
+  /api/services/v1/Getping:
     get:
       summary: Alive check
       description: When system is alive, returns "pong"
@@ -17,8 +17,8 @@ paths:
                 example: pong
       tags:
         - operation
-
-  /v1/invoices/{paymentReferenceId}:
+      
+  /api/services/v1/Checkinvoiceinpdf/{paymentReferenceId}:
     parameters:
       - name: paymentReferenceId
         in: path
@@ -39,8 +39,7 @@ paths:
             - invoice
           default: invoice
         required: false
-      
-
+        
     head:
       responses:
         200:
@@ -52,6 +51,29 @@ paths:
       tags:
        - invoices
        
+
+  /api/services/v1/Getinvoicedata/{paymentReferenceId}:
+    parameters:
+      - name: paymentReferenceId
+        in: path
+        description: Variable symbol
+        required: true
+        content: 
+          text/plain:
+              schema:
+                type: integer
+                example: 412354654
+      - name: type
+        in: query
+        description: Decision of invoice type - default value "invoice"
+        schema: 
+          type: string
+          enum:
+            - proforma
+            - invoice
+          default: invoice
+        required: false
+        
     get:
       summary: Download invoice data
       responses:
@@ -68,7 +90,7 @@ paths:
       tags:
         - invoices
   
-  /v1/invoices/{paymentReferenceId}/pdf:
+  /api/services/v1/Getinvoicedatapdf/{paymentReferenceId}:
     parameters:
       - name: paymentReferenceId
         in: path
@@ -98,7 +120,7 @@ paths:
   
     
 
-  /v1/invoices:
+  /api/services/v1/Getcustomerinvoice:
     get:
       summary: Filter invoices, return invoice data
       parameters:
@@ -123,6 +145,7 @@ paths:
       tags:
         - invoices
 
+  /api/services/v1/createInvoice:
     post:
       summary: Creates new invoice
       requestBody:
@@ -492,4 +515,3 @@ components:
             type: string
             description: Value of field
             example: 'vzduchoplavec(a)vzduchoplavecka.cz'
-
