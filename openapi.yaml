@@ -3,7 +3,7 @@ info:
   title: ERP REST API
   version: 0.1.0
 paths:
-  /api/services/v1/Getping:
+  /api/services/v1/getping:
     post:
       summary: Alive check
       description: When system is alive, returns "pong"
@@ -17,8 +17,98 @@ paths:
                 example: pong
       tags:
         - operation
+        
+  /api/services/v1/authorization:
+    parameters:
+      - name: response_type
+        in: query
+        description: Tells the authorization server which grant to execute.
+        schema:
+          type: string
+          default: ""
+        required: true
+      - name: response_mode
+        in: query
+        description: How the result of the authorization request is formatted.
+        schema:
+          type: string
+          enum: 
+            - query
+            - fragment
+            - form_post
+            - web_message
+        required: false
+      - name: client_id
+        in: query
+        description: The ID of the application that asks for authorization.
+        schema:
+          type: string
+          format: uuid
+          default: "028e12d1-be7a-4913-b797-7e848c4e4977"
+        required: true
+      - name: request_url
+        in: query
+        description: Holds a URL. A successful response from this endpoint results in a redirect to this URL.
+        schema:
+          type: string
+          default: ""
+        required: true
+      - name: scope
+        in: query
+        description: A space-delimited list of permissions that the application requires.
+        schema:
+          type: string
+          default: ""
+        required: true
+      - name: state
+        in: query
+        description: An opaque value, used for security purposes. If this request parameter is set in the request, then it is returned to the application as part of the redirect_uri.
+        schema:
+          type: string
+          default: ""
+        required: true
+        
+    post:
+      summary: Authentication
+      description: The /authorization endpoint is used to interact with the resource owner and get the authorization to access the protected resource. To better understand this, imagine that you want to log in to a service using your Google account. First, the service redirects you to Google in order to authenticate (if you are not already logged in) and then you will get a consent screen, where you will be asked to authorize the service to access some of your data (protected resources); for example, your email address and your list of contacts.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: pong
+      tags:
+        - operation
+        
+  /api/services/v1/oauth/token:
+    post:
+      summary: Token endpoint
+      description: The /oauth/token endpoint is used by the application in order to get an access token or a refresh token. It is used by all flows except for the Implicit Flow because in that case an access token is issued directly.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: pong
+      tags:
+        - operation
       
-  /api/services/v1/Checkinvoiceinpdf:
+  /api/services/v1/checkinvoiceinpdf:
+    parameters:
+      - name: type
+        in: query
+        description: Decision of invoice type - default value "invoice"
+        schema: 
+          type: string
+          enum:
+            - proforma
+            - invoice
+          default: invoice
+        required: false
     post:
       summary: Checks existence of generated invoice in PDF
       requestBody:
@@ -37,7 +127,18 @@ paths:
        - invoices
        
 
-  /api/services/v1/Getinvoicedata:
+  /api/services/v1/getinvoicedata:
+    parameters:
+      - name: type
+        in: query
+        description: Decision of invoice type - default value "invoice"
+        schema: 
+          type: string
+          enum:
+            - proforma
+            - invoice
+          default: invoice
+        required: false
     post:
       requestBody:
         required: true
@@ -53,14 +154,13 @@ paths:
             application/json:
               schema: 
                 $ref: '#/components/schemas/Invoice'
-
         404:
           description: Invoice not found
 
       tags:
         - invoices
   
-  /api/services/v1/Getinvoicedatapdf:
+  /api/services/v1/getinvoicedatapdf:
     post:
       requestBody:
         required: true
@@ -76,7 +176,6 @@ paths:
             application/json:
               schema: 
                 $ref: '#/components/schemas/InvoicePDF'
-
         404:
           description: Invoice not found
       tags:
@@ -84,7 +183,7 @@ paths:
   
     
 
-  /api/services/v1/Getcustomerinvoice:
+  /api/services/v1/getcustomerinvoice:
     post:
       summary: Filter invoices, return invoice data
       requestBody:
@@ -108,7 +207,7 @@ paths:
       tags:
         - invoices
 
-  /api/services/v1/createInvoice:
+  /api/services/v1/createinvoice:
     post:
       summary: Creates new invoice
       requestBody:
@@ -117,9 +216,6 @@ paths:
           application/json:
             schema: 
                 $ref: '#/components/schemas/InvoiceInput'
-
-                        
-
       responses:
         200:
           description: Invoice created
@@ -149,7 +245,6 @@ paths:
         schema: 
           type: string
           example: '123456789'
-      
       responses:
           200:
             description: Successful Response
@@ -171,7 +266,6 @@ paths:
           application/json:
             schema: 
                 $ref: '#/components/schemas/CustomerInput'
-                
       responses:
         200:
           description: Successful Response
@@ -193,7 +287,6 @@ paths:
             application/json:
               schema: 
                 $ref: '#/components/schemas/ErrorValidation'
-        
       tags:
        - customers
   
@@ -247,7 +340,6 @@ paths:
           application/json:
             schema: 
                 $ref: '#/components/schemas/Customer'
-                
       responses:
         200:
           description: Successful Response
@@ -354,17 +446,15 @@ components:
               
     InvoiceInput:
         type: object
-        require:
-        - _data
         properties:
-          required:
-            - paymentReferenceId
-            - currency
-            - countryCode
-            - type
-            - customerId
-            - items
           _data:
+            required:
+              - paymentReferenceId
+              - currency
+              - countryCode
+              - type
+              - customerId
+              - items
             properties:
               paymentReferenceId:
                 type: integer
@@ -534,8 +624,6 @@ components:
     PaymentReference:
       allOf:
       - type: object
-        required:
-          - _data
         properties:
           _data:
             type: object
@@ -550,8 +638,6 @@ components:
     CustomerId:
       allOf:
       - type: object
-        required:
-          - _data
         properties:
           _data:
             type: object
