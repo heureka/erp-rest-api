@@ -25,7 +25,7 @@ paths:
         description: Tells the authorization server which grant to execute.
         schema:
           type: string
-          default: ""
+          default: "code"
         required: true
       - name: client_id
         in: query
