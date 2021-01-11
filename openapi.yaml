@@ -41,12 +41,6 @@ paths:
         schema:
           type: string
         required: true
-      - name: scope
-        in: query
-        description: A space-delimited list of permissions that the application requires.
-        schema:
-          type: string
-        required: true
       - name: state
         in: query
         description: An opaque value, used for security purposes. If this request parameter is set in the request, then it is returned to the application as part of the redirect_uri.
