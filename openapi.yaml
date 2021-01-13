@@ -3,7 +3,7 @@ info:
   title: ERP REST API
   version: 0.1.0
 paths:
-  /api/services/v1/getping:
+  /api/services/v1/operations/getping:
     post:
       summary: Alive check
       description: When system is alive, returns "pong"
@@ -16,9 +16,9 @@ paths:
                 type: string
                 example: pong
       tags:
-        - operation
+        - operations
         
-  /api/services/v1/oauth/authorize:
+  /api/services/v1/operations/authorize:
     parameters:
       - name: response_type
         in: query
@@ -55,14 +55,36 @@ paths:
         '200':
           description: Successful Response
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-                example: pong
+                type: object
+                required:
+                  - access_token
+                  - token_type
+                  - expires_in
+                  - refresh_token
+                properties:
+                  access_token:
+                    type: string
+                    example: '028e12d1-be7a-4913-b797-7e848c4e4977'
+                    description: The access token string as issued by the authorization server.
+                  token_type:
+                    type: string
+                    example: 'bearer'
+                    description: The type of token this is, typically just the string “bearer”.
+                  expires_in:
+                    type: string
+                    format: datetime
+                    example: '2012-04-23T18:25:43.511Z'
+                    description: If the access token expires, the server should reply with the duration of time the access token is granted for.
+                  refresh_token:
+                    type: string
+                    example: '028e12d1-be7a-4913-b797-7e848c4e4977'
+                    description: If the access token will expire, then it is useful to return a refresh token which applications can use to obtain another access token. However, tokens issued with the implicit grant cannot be issued a refresh token.
       tags:
-        - operation
+        - operations
         
-  /api/services/v1/oauth/token:
+  /api/services/v1/operations/token:
     post:
       summary: Token endpoint
       description: The /api/services/v1/oauth/token endpoint is used by the application in order to get an access token or a refresh token. It is used by all flows except for the Implicit Flow because in that case an access token is issued directly.
@@ -73,11 +95,12 @@ paths:
             text/plain:
               schema:
                 type: string
-                example: pong
       tags:
-        - operation
-      
-  /api/services/v1/checkinvoiceinpdf:
+        - operations
+
+
+
+  /api/services/v1/invoices/checkinvoiceinpdf:
     parameters:
       - name: type
         in: query
@@ -106,8 +129,7 @@ paths:
       tags:
        - invoices
        
-
-  /api/services/v1/getinvoicedata:
+  /api/services/v1/invoices/getinvoicedata:
     parameters:
       - name: type
         in: query
@@ -140,7 +162,7 @@ paths:
       tags:
         - invoices
   
-  /api/services/v1/getinvoicedatapdf:
+  /api/services/v1/invoices/getinvoicedatapdf:
     post:
       requestBody:
         required: true
@@ -161,9 +183,7 @@ paths:
       tags:
         - invoices
   
-    
-
-  /api/services/v1/getcustomerinvoice:
+  /api/services/v1/invoices/getcustomerinvoice:
     post:
       summary: Filter invoices, return invoice data
       requestBody:
@@ -187,7 +207,7 @@ paths:
       tags:
         - invoices
 
-  /api/services/v1/createinvoice:
+  /api/services/v1/invoices/createinvoice:
     post:
       summary: Creates new invoice
       requestBody:
@@ -213,9 +233,8 @@ paths:
          - invoices
 
  
-
-  
-  /v1/customers:
+ 
+  /api/services/v1/customers/customers:
     get:
       summary: Get customers from ERP
       parameters:
@@ -270,7 +289,7 @@ paths:
       tags:
        - customers
   
-  /v1/customers/{customerId}:
+  /api/services/v1/customers/customers/{customerId}:
     get:
       summary: Get one customer from ERP
       parameters:
@@ -343,6 +362,7 @@ paths:
                 $ref: '#/components/schemas/ErrorValidation' 
       tags:
        - customers
+
 
 
 components:
@@ -636,8 +656,8 @@ components:
       description: This API uses OAuth 2 with the implicit grant flow. [More info](https://api.example.com/docs/auth)
       flows:
         authorizationCode:
-          authorizationUrl: /api/services/v1/oauth2/authorize
-          tokenUrl: /api/services/v1/oauth2/token
+          authorizationUrl: "/api/services/v1/oauth2/authorize"
+          tokenUrl: "/api/services/v1/oauth2/token"
           scopes: {}
 
 security:
