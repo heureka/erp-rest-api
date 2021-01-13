@@ -234,16 +234,15 @@ paths:
 
  
  
-  /api/services/v1/customers/customers:
-    get:
+  /api/services/v1/customers/getcustomerdata:
+    post:
       summary: Get customers from ERP
-      parameters:
-      - name: identificationNumber
-        in: query
-        description: identificationNumber IC
-        schema: 
-          type: string
-          example: '123456789'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/IdentificationNumber'
       responses:
           200:
             description: Successful Response
@@ -255,7 +254,8 @@ paths:
                       $ref: '#/components/schemas/Customer'
       tags:
        - customers
-       
+  
+  /api/services/v1/customers/createcustomer:
     post:
       summary: Create customer in ERP
       requestBody:
@@ -289,18 +289,16 @@ paths:
       tags:
        - customers
   
-  /api/services/v1/customers/customers/{customerId}:
-    get:
+  /api/services/v1/customers/getcustomerbyid:
+    post:
       summary: Get one customer from ERP
-      parameters:
-      - name: customerId
-        in: path
+      requestBody:
         description: ERP guid
-        schema: 
-          type: string
-          format: uuid
-          example: 67f65327-6ff5-4d2d-a967-7987773dbc5b
         required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerId'
       responses:
         200:
           description: Successful Response
@@ -321,24 +319,16 @@ paths:
       tags:
        - customers
     
-    put:
+  /api/services/v1/customers/updatecustomer:
+    post:
       summary: Update customer in ERP
-      parameters:
-      - name: customerId
-        in: path
-        description: ERP guid
-        schema: 
-          type: string
-          format: uuid
-          example: 67f65327-6ff5-4d2d-a967-7987773dbc5b
-        required: true
       requestBody:
-        description: All fields are optional.
+        description: All fields are optional except __"customerId"__.
         required: true
         content:
           application/json:
             schema: 
-                $ref: '#/components/schemas/Customer'
+                $ref: '#/components/schemas/CustomerInputWithId'
       responses:
         200:
           description: Successful Response
@@ -368,75 +358,154 @@ paths:
 components:
   schemas:
     CustomerInput:
-      type: object
-      required:
-        - name
-        - identificationNumber
-        - isVatPayer
-        - street
-        - city
-        - postCode
-        - countryCode
-        - email
-        - customerId
-      properties:
-        name: 
-          type: string
-          description: Name of the customers company.
-          example: Prvni vzduchoplavecka a.s.
-        isActive:
-          type: boolean
-          description: When customer is manual checked -> marked as true
-          example: true
-        identificationNumber:
-          description: Identification number of the customer (IČO)
-          type: string
-          example: "123456789"
-        vatNumber:
-          description: VAT number of the customer (DIČ).
-          type: string
-          example: "10000001"
-        vatIdentificationNumber:
-          description: Slovak IC DIC
-          type: string
-          example: "10000001"
-        isVatPayer:
-          type: boolean
-          description: Whether the customer is a VAT payer or not.
-          example: true
-        street:
-          description: Street from the customers address.
-          type: string
-          example: U plynojemu 69
-        city:
-          description: City from the customers address.
-          type: string
-          example: Pardubice
-        postCode:
-          description: Post code from the customers address.
-          type: string
-          example: "32000"
-        countryCode:
-          description: Code of country from the customers address - ISO 3166-1 alpha-3 - uppercase.
-          format: countryCode
-          type: string
-          example: CZE
-        telephone:
-          description: Customers telephone number with country prefix.
-          format: phone
-          type: string
-          example: "+420605413742"
-        email:
-          description: Customers e-mail address
-          type: string
-          format: email
-          example: kapitan@vzduchoplavecka.cz
+      allOf:
+      - type: object
+        properties:
+          _data:
+            type: object
+            required:
+              - name
+              - identificationNumber
+              - isVatPayer
+              - street
+              - city
+              - postCode
+              - countryCode
+              - email
+            properties:
+              name: 
+                type: string
+                description: Name of the customers company.
+                example: Prvni vzduchoplavecka a.s.
+              isActive:
+                type: boolean
+                description: When customer is manual checked -> marked as true
+                example: true
+              identificationNumber:
+                description: Identification number of the customer (IČO)
+                type: string
+                example: "123456789"
+              vatNumber:
+                description: VAT number of the customer (DIČ).
+                type: string
+                example: "10000001"
+              vatIdentificationNumber:
+                description: Slovak IC DIC
+                type: string
+                example: "10000001"
+              isVatPayer:
+                type: boolean
+                description: Whether the customer is a VAT payer or not.
+                example: true
+              street:
+                description: Street from the customers address.
+                type: string
+                example: U plynojemu 69
+              city:
+                description: City from the customers address.
+                type: string
+                example: Pardubice
+              postCode:
+                description: Post code from the customers address.
+                type: string
+                example: "32000"
+              countryCode:
+                description: Code of country from the customers address - ISO 3166-1 alpha-3 - uppercase.
+                format: countryCode
+                type: string
+                example: CZE
+              telephone:
+                description: Customers telephone number with country prefix.
+                format: phone
+                type: string
+                example: "+420605413742"
+              email:
+                description: Customers e-mail address
+                type: string
+                format: email
+                example: kapitan@vzduchoplavecka.cz
           
-    Customer:
-     allOf:
+    CustomerInputWithId:
+      allOf:
       - $ref: '#/components/schemas/CustomerInput'
       - type: object
         properties:
+          _data:
+            type: object
+            required:
+              - customerId
+            properties:
+              customerId: 
+                type: string
+                format: uuid
+                description: ERP guid
+                example: 67f65327-6ff5-4d2d-a967-7987773dbc5b
+                
+    Customer:
+      allOf:
+      - type: object
+        required:
+          - name
+          - identificationNumber
+          - isVatPayer
+          - street
+          - city
+          - postCode
+          - countryCode
+          - email
+          - customerId
+        properties:
+          name: 
+            type: string
+            description: Name of the customers company.
+            example: Prvni vzduchoplavecka a.s.
+          isActive:
+            type: boolean
+            description: When customer is manual checked -> marked as true
+            example: true
+          identificationNumber:
+            description: Identification number of the customer (IČO)
+            type: string
+            example: "123456789"
+          vatNumber:
+            description: VAT number of the customer (DIČ).
+            type: string
+            example: "10000001"
+          vatIdentificationNumber:
+            description: Slovak IC DIC
+            type: string
+            example: "10000001"
+          isVatPayer:
+            type: boolean
+            description: Whether the customer is a VAT payer or not.
+            example: true
+          street:
+            description: Street from the customers address.
+            type: string
+            example: U plynojemu 69
+          city:
+            description: City from the customers address.
+            type: string
+            example: Pardubice
+          postCode:
+            description: Post code from the customers address.
+            type: string
+            example: "32000"
+          countryCode:
+            description: Code of country from the customers address - ISO 3166-1 alpha-3 - uppercase.
+            format: countryCode
+            type: string
+            example: CZE
+          telephone:
+            description: Customers telephone number with country prefix.
+            format: phone
+            type: string
+            example: "+420605413742"
+          email:
+            description: Customers e-mail address
+            type: string
+            format: email
+            example: kapitan@vzduchoplavecka.cz
           customerId: 
             type: string
             format: uuid
@@ -445,7 +514,8 @@ components:
           
               
     InvoiceInput:
-        type: object
+      allOf:
+      - type: object
         properties:
           _data:
             required:
@@ -649,7 +719,21 @@ components:
                 format: uuid
                 example: '028e12d1-be7a-4913-b797-7e848c4e4977'
             description: GUID from ERP
-            
+    
+    IdentificationNumber:
+      allOf:
+      - type: object
+        properties:
+          _data:
+            type: object
+            required:
+              - identificationNumber
+            properties:
+              identificationNumber:
+                type: string
+                description: identificationNumber IC
+                example: '123456789'
+  
   securitySchemes:
     oAuth2:
       type: oauth2
