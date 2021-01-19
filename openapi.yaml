@@ -51,7 +51,9 @@ paths:
         
     post:
       summary: Authentication
+      deprecated: true
       description: The /api/services/v1/oauth/authorize endpoint is used to interact with the resource owner and get the authorization to access the protected resource.
+      security: []
       responses:
         '200':
           description: Successful Response
@@ -89,6 +91,7 @@ paths:
     post:
       summary: Token endpoint
       description: The /api/services/v1/oauth/token endpoint is used by the application in order to get an access token or a refresh token. It is used by all flows except for the Implicit Flow because in that case an access token is issued directly.
+      security: []
       responses:
         '200':
           description: Successful Response
