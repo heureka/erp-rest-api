@@ -536,7 +536,7 @@ components:
                   - HEF
                   - CEN
                   - OCS
-              customer:
+              invoice:
                 required:
                   - paymentReferenceId
                   - currency
