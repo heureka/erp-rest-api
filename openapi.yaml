@@ -9,7 +9,7 @@ paths:
       description: When system is alive, returns "pong"
       security: []
       responses:
-        '200':
+        200:
           description: Successful Response
           content:
             text/plain:
@@ -55,7 +55,7 @@ paths:
       description: The /api/services/v1/oauth/authorize endpoint is used to interact with the resource owner and get the authorization to access the protected resource.
       security: []
       responses:
-        '200':
+        200:
           description: Successful Response
           content:
             application/json:
@@ -93,7 +93,7 @@ paths:
       description: The /api/services/v1/oauth/token endpoint is used by the application in order to get an access token or a refresh token. It is used by all flows except for the Implicit Flow because in that case an access token is issued directly.
       security: []
       responses:
-        '200':
+        200:
           description: Successful Response
           content:
             text/plain:
@@ -160,8 +160,12 @@ paths:
             application/json:
               schema: 
                 $ref: '#/components/schemas/Invoice'
-        404:
-          description: Invoice not found
+        404:  
+          description: Error response from ERP
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ErrorMessage'
 
       tags:
         - invoices
@@ -183,7 +187,11 @@ paths:
               schema: 
                 $ref: '#/components/schemas/InvoicePDF'
         404:
-          description: Invoice not found
+          description: Error response from ERP
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ErrorMessage'
       tags:
         - invoices
   
@@ -206,7 +214,17 @@ paths:
                 items:
                   $ref: '#/components/schemas/Invoice'
         404:
-          description: Customer id not found
+          description: Error response from ERP
+          content:
+            application/json:
+              schema: 
+                allOf:
+                - $ref: '#/components/schemas/ErrorMessage'
+                - type: object
+                  properties:
+                    errorMessage:
+                      type: string
+                      example: Customer id not found
             
       tags:
         - invoices
@@ -233,6 +251,18 @@ paths:
             application/json:
               schema: 
                 $ref: '#/components/schemas/ErrorValidation'
+        404:
+          description: Error response from ERP
+          content:
+            application/json:
+              schema: 
+                allOf:
+                - $ref: '#/components/schemas/ErrorMessage'
+                - type: object
+                  properties:
+                    errorMessage:
+                      type: string
+                      example: Customer not created
       tags:
          - invoices
 
@@ -256,6 +286,18 @@ paths:
                   type: array
                   items:
                       $ref: '#/components/schemas/Customer'
+          404:
+            description: Error response from ERP
+            content:
+              application/json:
+                schema: 
+                  allOf:
+                  - $ref: '#/components/schemas/ErrorMessage'
+                  - type: object
+                    properties:
+                      errorMessage:
+                        type: string
+                        example: Customer not found
       tags:
        - customers
   
@@ -290,6 +332,18 @@ paths:
             application/json:
               schema: 
                 $ref: '#/components/schemas/ErrorValidation'
+        404:
+          description: Error response from ERP
+          content:
+            application/json:
+              schema: 
+                allOf:
+                - $ref: '#/components/schemas/ErrorMessage'
+                - type: object
+                  properties:
+                    errorMessage:
+                      type: string
+                      example: Customer not created
       tags:
        - customers
   
@@ -319,7 +373,17 @@ paths:
                         description: ERP guid
                         example: 67f65327-6ff5-4d2d-a967-7987773dbc5b
         404:
-          description: Customer not found
+          description: Error response from ERP
+          content:
+            application/json:
+              schema: 
+                allOf:
+                - $ref: '#/components/schemas/ErrorMessage'
+                - type: object
+                  properties:
+                    errorMessage:
+                      type: string
+                      example: Customer not found
       tags:
        - customers
     
@@ -354,6 +418,18 @@ paths:
             application/json:
               schema: 
                 $ref: '#/components/schemas/ErrorValidation' 
+        404:
+          description: Error response from ERP
+          content:
+            application/json:
+              schema: 
+                allOf:
+                - $ref: '#/components/schemas/ErrorMessage'
+                - type: object
+                  properties:
+                    errorMessage:
+                      type: string
+                      example: Customer not found
       tags:
        - customers
 
@@ -752,7 +828,26 @@ components:
                 type: string
                 description: identificationNumber IC
                 example: '123456789'
-  
+                
+    ErrorMessage:
+      allOf:
+      - type: object
+        required:
+          - status
+          - errorMessage
+        properties:
+          status:
+            type: integer
+            description: Error status code from ERP
+            example: 404
+          errorMessage:
+            type: string
+            description: Error message from ERP
+            example: Invoice not found
+            
+          
+
+
   securitySchemes:
     oAuth2:
       type: oauth2
