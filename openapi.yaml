@@ -161,7 +161,7 @@ paths:
               schema: 
                 $ref: '#/components/schemas/Invoice'
         404:  
-          description: Error response from ERP
+          description: "Error response from ERP, but this status is not http status"
           content:
             application/json:
               schema: 
@@ -187,7 +187,7 @@ paths:
               schema: 
                 $ref: '#/components/schemas/InvoicePDF'
         404:
-          description: Error response from ERP
+          description: "Error response from ERP, but this status is not http status"
           content:
             application/json:
               schema: 
@@ -214,7 +214,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/Invoice'
         404:
-          description: Error response from ERP
+          description: "Error response from ERP, but this status is not http status"
           content:
             application/json:
               schema: 
@@ -252,7 +252,7 @@ paths:
               schema: 
                 $ref: '#/components/schemas/ErrorValidation'
         404:
-          description: Error response from ERP
+          description: "Error response from ERP, but this status is not http status"
           content:
             application/json:
               schema: 
@@ -287,7 +287,7 @@ paths:
                   items:
                       $ref: '#/components/schemas/Customer'
           404:
-            description: Error response from ERP
+            description: "Error response from ERP, but this status is not http status"
             content:
               application/json:
                 schema: 
@@ -333,7 +333,7 @@ paths:
               schema: 
                 $ref: '#/components/schemas/ErrorValidation'
         404:
-          description: Error response from ERP
+          description: "Error response from ERP, but this status is not http status"
           content:
             application/json:
               schema: 
@@ -373,7 +373,7 @@ paths:
                         description: ERP guid
                         example: 67f65327-6ff5-4d2d-a967-7987773dbc5b
         404:
-          description: Error response from ERP
+          description: "Error response from ERP, but this status is not http status"
           content:
             application/json:
               schema: 
@@ -419,7 +419,7 @@ paths:
               schema: 
                 $ref: '#/components/schemas/ErrorValidation' 
         404:
-          description: Error response from ERP
+          description: "Error response from ERP, but this status is not http status"
           content:
             application/json:
               schema: 
