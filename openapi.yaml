@@ -19,40 +19,42 @@ paths:
       tags:
         - operations
         
-  /api/services/v1/operations/authorize:
-    parameters:
-      - name: response_type
-        in: query
-        description: Tells the authorization server which grant to execute.
-        schema:
-          type: string
-          default: "code"
-        required: true
-      - name: client_id
-        in: query
-        description: The ID of the application that asks for authorization.
-        schema:
-          type: string
-          format: uuid
-          default: "028e12d1-be7a-4913-b797-7e848c4e4977"
-        required: true
-      - name: redirect_uri
-        in: query
-        description: Holds a URL. A successful response from this endpoint results in a redirect to this URL.
-        schema:
-          type: string
-        required: true
-      - name: state
-        in: query
-        description: An opaque value, used for security purposes. If this request parameter is set in the request, then it is returned to the application as part of the redirect_uri.
-        schema:
-          type: string
-        required: true
-        
+  /{tenant_id}/oauth2/token:
     post:
-      summary: Authentication
-      deprecated: true
-      description: The /api/services/v1/oauth/authorize endpoint is used to interact with the resource owner and get the authorization to access the protected resource.
+      parameters:
+        - in: path
+          name: tenant_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ""
+      
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              allOf:
+              - type: object
+                required:
+                  - grant_type
+                  - client_id
+                  - client_secret
+                properties:
+                  grant_type:
+                    type: string
+                    default: "client_credentials"
+                    description: ""
+                  client_id:
+                    type: string
+                    format: uuid
+                    description: ""
+                  client_secret:
+                    type: string
+                    description: ""
+      
+      summary: Token endpoint
       security: []
       responses:
         200:
@@ -60,45 +62,67 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - access_token
-                  - token_type
-                  - expires_in
-                  - refresh_token
-                properties:
-                  access_token:
-                    type: string
-                    example: '028e12d1-be7a-4913-b797-7e848c4e4977'
-                    description: The access token string as issued by the authorization server.
-                  token_type:
-                    type: string
-                    example: 'bearer'
-                    description: The type of token this is, typically just the string “bearer”.
-                  expires_in:
-                    type: string
-                    format: datetime
-                    example: '2012-04-23T18:25:43.511Z'
-                    description: If the access token expires, the server should reply with the duration of time the access token is granted for.
-                  refresh_token:
-                    type: string
-                    example: '028e12d1-be7a-4913-b797-7e848c4e4977'
-                    description: If the access token will expire, then it is useful to return a refresh token which applications can use to obtain another access token. However, tokens issued with the implicit grant cannot be issued a refresh token.
-      tags:
-        - operations
-        
-  /api/services/v1/operations/token:
-    post:
-      summary: Token endpoint
-      description: The /api/services/v1/oauth/token endpoint is used by the application in order to get an access token or a refresh token. It is used by all flows except for the Implicit Flow because in that case an access token is issued directly.
-      security: []
-      responses:
-        200:
-          description: Successful Response
+                allOf:
+                - type: object
+                  properties:
+                    token_type:
+                      type: string
+                      default: Bearer
+                    expires_in:
+                      type: string
+                      default: "3599"
+                    ext_expires_in:
+                      type: string
+                      default: "3599"
+                    expires_on:
+                      type: string
+                      default: "1612266407"
+                    not_before:
+                      type: string
+                      default: "1612262507"
+                    resource:
+                      type: string
+                      format: uuid
+                      default: "57a583fa-240e-4c4d-abea-ad3fec4383ca"
+                    access_token:
+                      type: string
+                      default: "sdnMMASNDjds23154ASdKkh"
+                    
+        400:
+          description: Bad request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                allOf:
+                - type: object
+                  properties:
+                    error:
+                      type: string
+                      default: "Invalid request"
+                    error_description:
+                      type: string
+                      default: "Tenant not found"
+                    error_codes:
+                      type: array
+                      items: 
+                        type: integer
+                        default: 90002
+                    timestamp:
+                      type: string
+                      format: datetime
+                      default: "2021-02-02 11:49:50Z"
+                    trace_id:
+                      type: string
+                      format: uuid
+                      default: "6d70aa6f-ba7a-4c6e-b2fd-ab75242043e6"
+                    correlation_id:
+                      type: string
+                      format: uuid
+                      default: "57a583fa-240e-4c4d-abea-ad3fec4383ca"
+                    error_uri:
+                      type: string
+                      default: "https://login.microsoftonline.com/error?code=90002"
+                    
       tags:
         - operations
 
