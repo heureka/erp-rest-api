@@ -290,6 +290,42 @@ paths:
       tags:
          - invoices
 
+  /api/services/v1/invoices/cancleproformainvoice:
+    post:
+      summary: Cancles ProForma invoices
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+                $ref: '#/components/schemas/PaymentReference'
+      responses:
+        200:
+          description: Invoice canceled
+          content:
+              application/json:
+                schema:
+                  allOf:
+                  - type: object
+                    properties:
+                      status: 
+                        example: 200
+                  
+        404:
+          description: "Error response from ERP, but this status is not http status"
+          content:
+            application/json:
+              schema: 
+                allOf:
+                - $ref: '#/components/schemas/ErrorMessage'
+                - type: object
+                  properties:
+                    errorMessage:
+                      type: string
+                      example: Not found
+      tags:
+         - invoices
+
  
  
   /api/services/v1/customers/getcustomerdata:
