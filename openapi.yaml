@@ -195,6 +195,17 @@ paths:
         - invoices
   
   /api/services/v1/invoices/getinvoicedatapdf:
+    parameters:
+      - name: type
+        in: query
+        description: Decision of invoice type - default value "invoice"
+        schema: 
+          type: string
+          enum:
+            - proforma
+            - invoice
+          default: invoice
+        required: false
     post:
       requestBody:
         required: true
