@@ -868,6 +868,10 @@ components:
             type: string
             description: Error message from ERP
             example: Invoice not found
+          "$id":
+            type: string
+            description: Error id
+            example: "1"
             
           
 
