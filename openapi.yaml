@@ -277,9 +277,9 @@ paths:
         200:
           description: Invoice created
           content:
-              application/json:
-                schema: 
-                  $ref: '#/components/schemas/Invoice'
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Invoice'
         412:
           description: "Validation failed"  
           content:
@@ -680,60 +680,57 @@ components:
             required:
               - legalEntity
               - customer
+              - paymentReferenceId
+              - currency
+              - countryCode
+              - type
+              - customerId
+              - items
             properties:
               legalEntity:
                 $ref: '#/components/schemas/LegalEntity'
-              invoice:
-                required:
-                  - paymentReferenceId
-                  - currency
-                  - countryCode
-                  - type
-                  - customerId
-                  - items
-                properties:
-                  paymentReferenceId:
-                    type: integer
-                    description: "Variable symbol"
-                    example: 120004565
-                  currency:
-                    description: Three letter currency code by  ISO 4217 
-                    type: string
-                    example: CZK
-                  countryCode:
-                    description: Code of country - ISO 3166-1 alpha-3 - uppercase.
-                    format: countryCode
-                    type: string
-                    example: CZE
-                  type: 
-                    type: string
-                    description: Payment source
-                    enum:
-                      - autopay
-                      - manual
-                      - paybylink
-                      - banktransfer
-                      - backwardinvoicing
-                      - shoppingcard
-                    example: autopay
-                  customerId:
-                    type: string
-                    format: uuid
-                    description: GUID from ERP
-                    example: '028e12d1-be7a-4913-b797-7e848c4e4977'
-                  items:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        text:
-                          type: string
-                          example: Dobití kreditu do PPC systému Heureka.cz
-                        amount:
-                          type: string
-                          format: Decimal
-                          description: Price without VAT
-                          example: "10.50"
+              paymentReferenceId:
+                type: integer
+                description: "Variable symbol"
+                example: 120004565
+              currency:
+                description: Three letter currency code by  ISO 4217 
+                type: string
+                example: CZK
+              countryCode:
+                description: Code of country - ISO 3166-1 alpha-3 - uppercase.
+                format: countryCode
+                type: string
+                example: CZE
+              type: 
+                type: string
+                description: Payment source
+                enum:
+                  - autopay
+                  - manual
+                  - paybylink
+                  - banktransfer
+                  - backwardinvoicing
+                  - shoppingcard
+                example: autopay
+              customerId:
+                type: string
+                format: uuid
+                description: GUID from ERP
+                example: '028e12d1-be7a-4913-b797-7e848c4e4977'
+              items:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    text:
+                      type: string
+                      example: Dobití kreditu do PPC systému Heureka.cz
+                    amount:
+                      type: string
+                      format: Decimal
+                      description: Price without VAT
+                      example: "10.50"
       
     Invoice:
       allOf:
