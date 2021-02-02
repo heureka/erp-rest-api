@@ -476,7 +476,10 @@ components:
               - postCode
               - countryCode
               - email
+              - legalEntity
             properties:
+              legalEntity:
+                $ref: '#/components/schemas/LegalEntity'
               name: 
                 type: string
                 description: Name of the customers company.
@@ -549,6 +552,7 @@ components:
       allOf:
       - type: object
         required:
+          - legalEntity
           - name
           - identificationNumber
           - isVatPayer
@@ -559,6 +563,8 @@ components:
           - email
           - customerId
         properties:
+          legalEntity:
+            $ref: '#/components/schemas/LegalEntity'
           name: 
             type: string
             description: Name of the customers company.
@@ -629,13 +635,7 @@ components:
               - customer
             properties:
               legalEntity:
-                type: string
-                description: Legal Entity of Company
-                enum:
-                  - HEG
-                  - HEF
-                  - CEN
-                  - OCS
+                $ref: '#/components/schemas/LegalEntity'
               invoice:
                 required:
                   - paymentReferenceId
@@ -692,6 +692,7 @@ components:
       allOf:
       - type: object
         required:
+          - legalEntity
           - paymentReferenceId
           - currency
           - countryCode
@@ -704,6 +705,8 @@ components:
           - createdDate
           - dueDate
         properties:
+          legalEntity:
+            $ref: '#/components/schemas/LegalEntity'
           paymentReferenceId:
             type: integer
             description: "Variable symbol"
@@ -781,11 +784,11 @@ components:
         required:
           - pdf
         properties:
-            pdf: 
-              type: string
-              format: byte
-              description: Base64-encoded contents invoice PDF
-              example: UERG
+          pdf: 
+            type: string
+            format: byte
+            description: Base64-encoded contents invoice PDF
+            example: UERG
       
           
     ErrorValidation:
@@ -817,8 +820,11 @@ components:
           _data:
             type: object
             required:
+              - legalEntity
               - paymentReferenceId
             properties:
+              legalEntity:
+                $ref: '#/components/schemas/LegalEntity'
               paymentReferenceId:
                 type: integer
                 description: Variable symbol
@@ -831,8 +837,11 @@ components:
           _data:
             type: object
             required:
+              - legalEntity
               - customerId
             properties:
+              legalEntity:
+                $ref: '#/components/schemas/LegalEntity'
               customerId:
                 type: string
                 format: uuid
@@ -846,8 +855,11 @@ components:
           _data:
             type: object
             required:
+              - legalEntity
               - identificationNumber
             properties:
+              legalEntity:
+                $ref: '#/components/schemas/LegalEntity'
               identificationNumber:
                 type: string
                 description: identificationNumber IC
@@ -873,7 +885,15 @@ components:
             description: Error id
             example: "1"
             
-          
+    LegalEntity:
+      type: string
+      description: Legal Entity of Company
+      enum:
+        - HEG
+        - HEF
+        - CEN
+        - OCS
+        
 
 
   securitySchemes:
