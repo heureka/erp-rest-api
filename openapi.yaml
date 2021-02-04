@@ -531,10 +531,6 @@ components:
                 type: string
                 description: Name of the customers company.
                 example: Prvni vzduchoplavecka a.s.
-              isActive:
-                type: boolean
-                description: When customer is manual checked -> marked as true
-                example: true
               identificationNumber:
                 description: Identification number of the customer (IČO)
                 type: string
@@ -547,10 +543,6 @@ components:
                 description: Slovak IC DIC
                 type: string
                 example: "10000001"
-              isVatPayer:
-                type: boolean
-                description: Whether the customer is a VAT payer or not.
-                example: true
               street:
                 description: Street from the customers address.
                 type: string
@@ -632,10 +624,6 @@ components:
             description: Slovak IC DIC
             type: string
             example: "10000001"
-          isVatPayer:
-            type: boolean
-            description: Whether the customer is a VAT payer or not.
-            example: true
           street:
             description: Street from the customers address.
             type: string
