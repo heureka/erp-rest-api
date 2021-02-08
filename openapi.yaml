@@ -301,9 +301,9 @@ paths:
       tags:
          - invoices
 
-  /api/services/v1/invoices/cancleproformainvoice:
+  /api/services/v1/invoices/cancelproformainvoice:
     post:
-      summary: Cancles ProForma invoices
+      summary: Cancels ProForma invoices
       requestBody:
         required: true
         content:
