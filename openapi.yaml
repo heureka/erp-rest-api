@@ -129,17 +129,6 @@ paths:
 
 
   /api/services/v1/invoices/checkinvoiceinpdf:
-    parameters:
-      - name: type
-        in: query
-        description: Decision of invoice type - default value "invoice"
-        schema: 
-          type: string
-          enum:
-            - proforma
-            - invoice
-          default: invoice
-        required: false
     post:
       summary: Checks existence of generated invoice in PDF
       requestBody:
@@ -147,7 +136,7 @@ paths:
         content:
           application/json:
             schema: 
-              $ref: '#/components/schemas/PaymentReference'
+              $ref: '#/components/schemas/PaymentReferenceWithType'
       responses:
         200:
           description: Successful Response
@@ -158,24 +147,13 @@ paths:
        - invoices
        
   /api/services/v1/invoices/getinvoicedata:
-    parameters:
-      - name: type
-        in: query
-        description: Decision of invoice type - default value "invoice"
-        schema: 
-          type: string
-          enum:
-            - proforma
-            - invoice
-          default: invoice
-        required: false
     post:
       requestBody:
         required: true
         content:
           application/json:
             schema: 
-              $ref: '#/components/schemas/PaymentReference'
+              $ref: '#/components/schemas/PaymentReferenceWithType'
       summary: Download invoice data
       responses:
         200:
@@ -195,24 +173,13 @@ paths:
         - invoices
   
   /api/services/v1/invoices/getinvoicedatapdf:
-    parameters:
-      - name: type
-        in: query
-        description: Decision of invoice type - default value "invoice"
-        schema: 
-          type: string
-          enum:
-            - proforma
-            - invoice
-          default: invoice
-        required: false
     post:
       requestBody:
         required: true
         content:
           application/json:
             schema: 
-              $ref: '#/components/schemas/PaymentReference'
+              $ref: '#/components/schemas/PaymentReferenceWithType'
       summary: Download invoice data with PDF
       responses:
         200:
@@ -238,7 +205,7 @@ paths:
         content:
           application/json:
             schema: 
-              $ref: '#/components/schemas/CustomerId'
+              $ref: '#/components/schemas/CustomerIdWithType'
       responses:
         200:
           description: Successful Response
@@ -443,52 +410,6 @@ paths:
                         format: uuid
                         description: ERP guid
                         example: 67f65327-6ff5-4d2d-a967-7987773dbc5b
-        404:
-          description: "Error response from ERP, but this status is not http status"
-          content:
-            application/json:
-              schema: 
-                allOf:
-                - $ref: '#/components/schemas/ErrorMessage'
-                - type: object
-                  properties:
-                    errorMessage:
-                      type: string
-                      example: Customer not found
-      tags:
-       - customers
-    
-  /api/services/v1/customers/updatecustomer:
-    post:
-      summary: Update customer in ERP
-      requestBody:
-        description: All fields are optional except __"customerId"__.
-        required: true
-        content:
-          application/json:
-            schema: 
-                $ref: '#/components/schemas/CustomerInputWithId'
-      responses:
-        200:
-          description: Successful Response
-          content:
-            application/json:
-              schema: 
-                allOf:
-                  - $ref: '#/components/schemas/Customer'
-                  - type: object
-                    properties:
-                      customerId: 
-                        type: string
-                        format: uuid
-                        description: ERP guid
-                        example: 67f65327-6ff5-4d2d-a967-7987773dbc5b
-        412:
-          description: "Validation failed"  
-          content:
-            application/json:
-              schema: 
-                $ref: '#/components/schemas/ErrorValidation' 
         404:
           description: "Error response from ERP, but this status is not http status"
           content:
@@ -854,6 +775,7 @@ components:
             required:
               - legalEntity
               - paymentReferenceId
+              - type
             properties:
               legalEntity:
                 $ref: '#/components/schemas/LegalEntity'
@@ -861,6 +783,56 @@ components:
                 type: integer
                 description: Variable symbol
                 example: 412354654
+    
+    PaymentReferenceWithType:
+      allOf:
+      - type: object
+        properties:
+          _data:
+            type: object
+            required:
+              - legalEntity
+              - paymentReferenceId
+              - type
+            properties:
+              legalEntity:
+                $ref: '#/components/schemas/LegalEntity'
+              paymentReferenceId:
+                type: integer
+                description: Variable symbol
+                example: 412354654
+              type:
+                description: Decision of invoice type - default value "invoice"
+                type: string
+                enum:
+                  - proforma
+                  - invoice
+                default: invoice
+            
+    CustomerIdWithType:
+      allOf:
+      - type: object
+        properties:
+          _data:
+            type: object
+            required:
+              - legalEntity
+              - customerId
+            properties:
+              legalEntity:
+                $ref: '#/components/schemas/LegalEntity'
+              customerId:
+                type: string
+                format: uuid
+                example: '028e12d1-be7a-4913-b797-7e848c4e4977'
+              type:
+                description: Decision of invoice type - default value "invoice"
+                type: string
+                enum:
+                  - proforma
+                  - invoice
+                default: invoice
+            description: GUID from ERP
             
     CustomerId:
       allOf:
