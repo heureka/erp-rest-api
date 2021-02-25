@@ -264,7 +264,22 @@ paths:
                   properties:
                     errorMessage:
                       type: string
-                      example: Customer not created
+                      example: Invoice not created
+        409:
+          description: "Error response from ERP, but this status is not http status"
+          content:
+            application/json:
+              schema: 
+                allOf:
+                - $ref: '#/components/schemas/ErrorMessage'
+                - type: object
+                  properties:
+                    status:
+                      type: integer
+                      example: 409
+                    errorMessage:
+                      type: string
+                      example: Invoice already exists
       tags:
          - invoices
 
@@ -382,6 +397,21 @@ paths:
                     errorMessage:
                       type: string
                       example: Customer not created
+        409:
+          description: "Error response from ERP, but this status is not http status"
+          content:
+            application/json:
+              schema: 
+                allOf:
+                - $ref: '#/components/schemas/ErrorMessage'
+                - type: object
+                  properties:
+                    status:
+                      type: integer
+                      example: 409
+                    errorMessage:
+                      type: string
+                      example: Customer already exists
       tags:
        - customers
   
