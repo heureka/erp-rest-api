@@ -715,6 +715,16 @@ components:
                       format: Decimal
                       description: Price without VAT
                       example: "10.50"
+              createdDate:
+                type: string
+                format: date
+                description: "Date (datum vytvoreni) ISO 8601"
+                example: '2012-04-23T18:25:43.511Z'
+              dueDate:
+                type: string
+                format: date
+                description: "Date (termin splatnosti) ISO 8601"
+                example: '2012-04-23T18:25:43.511Z'
       
     Invoice:
       allOf:
