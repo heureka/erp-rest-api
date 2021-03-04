@@ -278,14 +278,23 @@ paths:
         content:
           application/json:
             schema: 
-                $ref: '#/components/schemas/InvoiceInput'
+              allOf:
+              - $ref: '#/components/schemas/InvoiceInput'
       responses:
         200:
           description: Invoice created
           content:
             application/json:
               schema: 
-                $ref: '#/components/schemas/Invoice'
+                allOf:
+                - $ref: '#/components/schemas/Invoice'
+                - type: object
+                  required:
+                    - statusCode
+                  properties:
+                    statusCode:
+                      type: integer
+                      example: 200
         412:
           description: Validation failed
           content:
@@ -428,12 +437,18 @@ paths:
                 allOf:
                   - $ref: '#/components/schemas/Customer'
                   - type: object
+                    required:
+                      - customerId
+                      - statusCode
                     properties:
                       customerId: 
                         type: string
                         format: uuid
                         description: ERP guid
                         example: 67f65327-6ff5-4d2d-a967-7987773dbc5b
+                      statusCode:
+                        type: integer
+                        example: 200
         412:
           description: Validation failed
           content:
