@@ -278,8 +278,7 @@ paths:
         content:
           application/json:
             schema: 
-              allOf:
-              - $ref: '#/components/schemas/InvoiceInput'
+              $ref: '#/components/schemas/InvoiceInput'
       responses:
         200:
           description: Invoice created
