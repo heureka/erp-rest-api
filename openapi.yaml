@@ -140,8 +140,30 @@ paths:
       responses:
         200:
           description: Successful Response
+          content:
+            application/json:
+              schema: 
+                allOf:
+                - type: object
+                  properties:
+                    statusCode:
+                      type: integer
+                      example: 200
+                    "$id":
+                      type: string
+                      example: "1"
         404:
           description: Invoice not found
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ErrorMessage'
+        412:
+          description: Validation failed
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ErrorValidationMessage'
       description: Returns no body content, only checks existence of invoice
       tags:
        - invoices
@@ -163,12 +185,17 @@ paths:
               schema: 
                 $ref: '#/components/schemas/Invoice'
         404:  
-          description: "Error response from ERP, but this status is not http status"
+          description: "Error response from ERP, but this statusCode is not http status code"
           content:
             application/json:
               schema: 
                 $ref: '#/components/schemas/ErrorMessage'
-
+        412:
+          description: Validation failed
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ErrorValidationMessage'
       tags:
         - invoices
   
@@ -189,11 +216,17 @@ paths:
               schema: 
                 $ref: '#/components/schemas/InvoicePDF'
         404:
-          description: "Error response from ERP, but this status is not http status"
+          description: "Error response from ERP, but this statusCode is not http status code"
           content:
             application/json:
               schema: 
                 $ref: '#/components/schemas/ErrorMessage'
+        412:
+          description: Validation failed
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ErrorValidationMessage'
       tags:
         - invoices
   
@@ -216,7 +249,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/Invoice'
         404:
-          description: "Error response from ERP, but this status is not http status"
+          description: "Error response from ERP, but this statusCode is not http status code"
           content:
             application/json:
               schema: 
@@ -227,6 +260,12 @@ paths:
                     errorMessage:
                       type: string
                       example: Customer id not found
+        412:
+          description: Validation failed
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ErrorValidationMessage'
             
       tags:
         - invoices
@@ -248,13 +287,13 @@ paths:
               schema: 
                 $ref: '#/components/schemas/Invoice'
         412:
-          description: "Validation failed"  
+          description: Validation failed
           content:
             application/json:
               schema: 
-                $ref: '#/components/schemas/ErrorValidation'
+                $ref: '#/components/schemas/ErrorValidationMessage'
         404:
-          description: "Error response from ERP, but this status is not http status"
+          description: "Error response from ERP, but this statusCode is not http status code"
           content:
             application/json:
               schema: 
@@ -266,7 +305,7 @@ paths:
                       type: string
                       example: Invoice not created
         409:
-          description: "Error response from ERP, but this status is not http status"
+          description: "Error response from ERP, but this statusCode is not http status code"
           content:
             application/json:
               schema: 
@@ -274,7 +313,7 @@ paths:
                 - $ref: '#/components/schemas/ErrorMessage'
                 - type: object
                   properties:
-                    status:
+                    statusCode:
                       type: integer
                       example: 409
                     errorMessage:
@@ -301,11 +340,15 @@ paths:
                   allOf:
                   - type: object
                     properties:
-                      status: 
+                      statusCode: 
+                        type: integer
                         example: 200
+                      "$id":
+                        type: string
+                        example: "1"
                   
         404:
-          description: "Error response from ERP, but this status is not http status"
+          description: "Error response from ERP, but this statusCode is not http status code"
           content:
             application/json:
               schema: 
@@ -315,7 +358,13 @@ paths:
                   properties:
                     errorMessage:
                       type: string
-                      example: Not found
+                      example: Proforma not found
+        412:
+          description: Validation failed
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ErrorValidationMessage'
       tags:
          - invoices
 
@@ -340,7 +389,7 @@ paths:
                   items:
                       $ref: '#/components/schemas/Customer'
           404:
-            description: "Error response from ERP, but this status is not http status"
+            description: "Error response from ERP, but this statusCode is not http status code"
             content:
               application/json:
                 schema: 
@@ -351,6 +400,12 @@ paths:
                       errorMessage:
                         type: string
                         example: Customer not found
+          412:
+            description: Validation failed
+            content:
+              application/json:
+                schema: 
+                  $ref: '#/components/schemas/ErrorValidationMessage'
       tags:
        - customers
   
@@ -380,13 +435,13 @@ paths:
                         description: ERP guid
                         example: 67f65327-6ff5-4d2d-a967-7987773dbc5b
         412:
-          description: "Validation failed"  
+          description: Validation failed
           content:
             application/json:
               schema: 
-                $ref: '#/components/schemas/ErrorValidation'
+                $ref: '#/components/schemas/ErrorValidationMessage'
         404:
-          description: "Error response from ERP, but this status is not http status"
+          description: "Error response from ERP, but this statusCode is not http status code"
           content:
             application/json:
               schema: 
@@ -398,7 +453,7 @@ paths:
                       type: string
                       example: Customer not created
         409:
-          description: "Error response from ERP, but this status is not http status"
+          description: "Error response from ERP, but this statusCode is not http status code"
           content:
             application/json:
               schema: 
@@ -406,7 +461,7 @@ paths:
                 - $ref: '#/components/schemas/ErrorMessage'
                 - type: object
                   properties:
-                    status:
+                    statusCode:
                       type: integer
                       example: 409
                     errorMessage:
@@ -441,7 +496,7 @@ paths:
                         description: ERP guid
                         example: 67f65327-6ff5-4d2d-a967-7987773dbc5b
         404:
-          description: "Error response from ERP, but this status is not http status"
+          description: "Error response from ERP, but this statusCode is not http status code"
           content:
             application/json:
               schema: 
@@ -452,6 +507,12 @@ paths:
                     errorMessage:
                       type: string
                       example: Customer not found
+        412:
+          description: Validation failed
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ErrorValidationMessage'
       tags:
        - customers
 
@@ -521,22 +582,6 @@ components:
                 type: string
                 format: email
                 example: kapitan@vzduchoplavecka.cz
-          
-    CustomerInputWithId:
-      allOf:
-      - $ref: '#/components/schemas/CustomerInput'
-      - type: object
-        properties:
-          _data:
-            type: object
-            required:
-              - customerId
-            properties:
-              customerId: 
-                type: string
-                format: uuid
-                description: ERP guid
-                example: 67f65327-6ff5-4d2d-a967-7987773dbc5b
                 
     Customer:
       allOf:
@@ -670,6 +715,16 @@ components:
                       format: Decimal
                       description: Price without VAT
                       example: "10.50"
+              createdDate:
+                type: string
+                format: date
+                description: "Date (datum vytvoreni) ISO 8601"
+                example: '2012-04-23T18:25:43.511Z'
+              dueDate:
+                type: string
+                format: date
+                description: "Date (termin splatnosti) ISO 8601"
+                example: '2012-04-23T18:25:43.511Z'
       
     Invoice:
       allOf:
@@ -772,28 +827,6 @@ components:
             format: byte
             description: Base64-encoded contents invoice PDF
             example: UERG
-      
-          
-    ErrorValidation:
-      type: array
-      items:
-        type: object
-        required:
-            - field
-            - description
-        properties:
-          field:
-            type: string
-            description: Name of invalid field 
-            example: email
-          description: 
-            type: string
-            description: Error description
-            example: 'Email is invalid'
-          value: 
-            type: string
-            description: Value of field
-            example: 'vzduchoplavec(a)vzduchoplavecka.cz'
             
     
     PaymentReference:
@@ -903,12 +936,12 @@ components:
       allOf:
       - type: object
         required:
-          - status
+          - statusCode
           - errorMessage
         properties:
-          status:
+          statusCode:
             type: integer
-            description: Error status code from ERP
+            description: Error statusCode from ERP
             example: 404
           errorMessage:
             type: string
@@ -918,6 +951,23 @@ components:
             type: string
             description: Error id
             example: "1"
+                
+    ErrorValidationMessage:
+      allOf:
+      - $ref: '#/components/schemas/ErrorMessage'
+      - type: object
+        required:
+          - statusCode
+          - errorMessage
+        properties:
+          statusCode:
+            type: integer
+            description: Error statusCode from ERP
+            example: 412
+          errorMessage:
+            type: string
+            description: Error message from ERP
+            example: LegalEntity is not valid
             
     LegalEntity:
       type: string
@@ -935,8 +985,7 @@ components:
       type: oauth2
       description: This API uses OAuth 2 with the implicit grant flow. [More info](https://api.example.com/docs/auth)
       flows:
-        authorizationCode:
-          authorizationUrl: "/api/services/v1/operations/authorize"
+        clientCredentials:
           tokenUrl: "/api/services/v1/operations/token"
           scopes: {}
 
