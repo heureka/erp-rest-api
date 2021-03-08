@@ -145,6 +145,8 @@ paths:
               schema: 
                 allOf:
                 - type: object
+                  required:
+                    - statusCode
                   properties:
                     statusCode:
                       type: integer
@@ -183,7 +185,15 @@ paths:
           content:
             application/json:
               schema: 
-                $ref: '#/components/schemas/Invoice'
+                allOf:
+                  - $ref: '#/components/schemas/Invoice'
+                  - type: object
+                    required:
+                      - statusCode
+                    properties:
+                      statusCode:
+                        type: integer
+                        example: 200
         404:  
           description: "Error response from ERP, but this statusCode is not http status code"
           content:
@@ -214,7 +224,15 @@ paths:
           content:
             application/json:
               schema: 
-                $ref: '#/components/schemas/InvoicePDF'
+                allOf:
+                  - $ref: '#/components/schemas/InvoicePDF'
+                  - type: object
+                    required:
+                      - statusCode
+                    properties:
+                      statusCode:
+                        type: integer
+                        example: 200
         404:
           description: "Error response from ERP, but this statusCode is not http status code"
           content:
@@ -347,8 +365,10 @@ paths:
                 schema:
                   allOf:
                   - type: object
+                    required:
+                      - statusCode
                     properties:
-                      statusCode: 
+                      statusCode:
                         type: integer
                         example: 200
                       "$id":
@@ -395,7 +415,7 @@ paths:
                 schema:
                   type: array
                   items:
-                      $ref: '#/components/schemas/Customer'
+                    $ref: '#/components/schemas/Customer'
           404:
             description: "Error response from ERP, but this statusCode is not http status code"
             content:
@@ -426,7 +446,7 @@ paths:
         content:
           application/json:
             schema: 
-                $ref: '#/components/schemas/CustomerInput'
+              $ref: '#/components/schemas/CustomerInput'
       responses:
         200:
           description: Successful Response
@@ -503,7 +523,12 @@ paths:
                 allOf:
                   - $ref: '#/components/schemas/Customer'
                   - type: object
+                    required:
+                      - statusCode
                     properties:
+                      statusCode:
+                        type: integer
+                        example: 200
                       customerId: 
                         type: string
                         format: uuid
