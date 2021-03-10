@@ -486,21 +486,6 @@ paths:
                     errorMessage:
                       type: string
                       example: Customer not created
-        409:
-          description: "Error response from ERP, but this statusCode is not http status code"
-          content:
-            application/json:
-              schema: 
-                allOf:
-                - $ref: '#/components/schemas/ErrorMessage'
-                - type: object
-                  properties:
-                    statusCode:
-                      type: integer
-                      example: 409
-                    errorMessage:
-                      type: string
-                      example: Customer already exists
       tags:
        - customers
   
