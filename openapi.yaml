@@ -406,7 +406,27 @@ paths:
         content:
           application/json:
             schema: 
-              $ref: '#/components/schemas/IdentificationNumber'
+              allOf:
+                - type: object
+                  properties:
+                    _data:
+                      type: object
+                      required:
+                        - legalEntity
+                      properties:
+                        legalEntity:
+                          $ref: '#/components/schemas/LegalEntity'
+                        identificationNumber:
+                          type: string
+                          description: identificationNumber IC
+                          example: '123456789'
+                        customerIds:
+                          type: array
+                          items:
+                            type: string
+                            format: UUID
+                          description: Array of customer IDs
+                          example: ['e3859320-adf4-44e0-8ef2-ae2c5c438f74','b4b78101-534b-4453-9528-e6130eecfeaa']
       responses:
           200:
             description: Successful Response
