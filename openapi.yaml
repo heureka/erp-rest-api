@@ -396,6 +396,21 @@ paths:
                     errorMessage:
                       type: string
                       example: Proforma not found
+        410:
+          description: "Error response from ERP, but this statusCode is not http status code"
+          content:
+            application/json:
+              schema: 
+                allOf:
+                - $ref: '#/components/schemas/ErrorMessage'
+                - type: object
+                  properties:
+                    statusCode:
+                      type: integer
+                      example: 410
+                    errorMessage:
+                      type: string
+                      example: Proforma invoice with payment reference ID 100000075 cannot be canceled because it is partially or completely paid.
         412:
           description: Validation failed
           content:
