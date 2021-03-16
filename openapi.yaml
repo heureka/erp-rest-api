@@ -263,9 +263,18 @@ paths:
           content:
             application/json:
               schema: 
-                type: array
-                items:
-                  $ref: '#/components/schemas/Invoice'
+                allOf:
+                  - type: object
+                    required:
+                      - invoices
+                    properties:
+                      "$id":
+                        type: string
+                        example: "1"
+                      invoices:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Invoice'
         404:
           description: "Error response from ERP, but this statusCode is not http status code"
           content:
@@ -356,24 +365,24 @@ paths:
         content:
           application/json:
             schema: 
-                $ref: '#/components/schemas/PaymentReference'
+              $ref: '#/components/schemas/PaymentReference'
       responses:
         200:
           description: Invoice canceled
           content:
-              application/json:
-                schema:
-                  allOf:
-                  - type: object
-                    required:
-                      - statusCode
-                    properties:
-                      statusCode:
-                        type: integer
-                        example: 200
-                      "$id":
-                        type: string
-                        example: "1"
+            application/json:
+              schema:
+                allOf:
+                - type: object
+                  required:
+                    - statusCode
+                  properties:
+                    statusCode:
+                      type: integer
+                      example: 200
+                    "$id":
+                      type: string
+                      example: "1"
                   
         404:
           description: "Error response from ERP, but this statusCode is not http status code"
@@ -433,9 +442,18 @@ paths:
             content:
               application/json:
                 schema:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/Customer'
+                  allOf:
+                    - type: object
+                      required:
+                        - customers
+                      properties:
+                        "$id":
+                          type: string
+                          example: "1"
+                        customers:
+                          type: array
+                          items:
+                            $ref: '#/components/schemas/Customer'
           404:
             description: "Error response from ERP, but this statusCode is not http status code"
             content:
