@@ -122,7 +122,6 @@ paths:
                     error_uri:
                       type: string
                       default: "https://login.microsoftonline.com/error?code=90002"
-                    
       tags:
         - operations
 
@@ -166,6 +165,14 @@ paths:
             application/json:
               schema: 
                 $ref: '#/components/schemas/ErrorValidationMessage'
+        429:
+          description: Service overload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOverload'
+                  
+                  
       description: Returns no body content, only checks existence of invoice
       tags:
        - invoices
@@ -206,6 +213,12 @@ paths:
             application/json:
               schema: 
                 $ref: '#/components/schemas/ErrorValidationMessage'
+        429:
+          description: Service overload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOverload'
       tags:
         - invoices
   
@@ -245,6 +258,12 @@ paths:
             application/json:
               schema: 
                 $ref: '#/components/schemas/ErrorValidationMessage'
+        429:
+          description: Service overload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOverload'
       tags:
         - invoices
   
@@ -293,6 +312,12 @@ paths:
             application/json:
               schema: 
                 $ref: '#/components/schemas/ErrorValidationMessage'
+        429:
+          description: Service overload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOverload'
             
       tags:
         - invoices
@@ -354,6 +379,12 @@ paths:
                     errorMessage:
                       type: string
                       example: Invoice already exists
+        429:
+          description: Service overload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOverload'
       tags:
          - invoices
 
@@ -417,6 +448,12 @@ paths:
             application/json:
               schema: 
                 $ref: '#/components/schemas/ErrorValidationMessage'
+        429:
+          description: Service overload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOverload'
       tags:
          - invoices
 
@@ -487,6 +524,12 @@ paths:
               application/json:
                 schema: 
                   $ref: '#/components/schemas/ErrorValidationMessage'
+          429:
+            description: Service overload
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorOverload'
       tags:
        - customers
   
@@ -554,6 +597,12 @@ paths:
                     errorMessage:
                       type: string
                       example: Customer already exists
+        429:
+          description: Service overload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOverload'
       tags:
        - customers
   
@@ -605,6 +654,12 @@ paths:
             application/json:
               schema: 
                 $ref: '#/components/schemas/ErrorValidationMessage'
+        429:
+          description: Service overload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOverload'
       tags:
        - customers
 
@@ -1060,6 +1115,18 @@ components:
             type: string
             description: Error message from ERP
             example: LegalEntity is not valid
+            
+    ErrorOverload:
+      allOf:
+      - $ref: '#/components/schemas/ErrorMessage'
+      - type: object
+        properties:
+          statusCode:
+            type: integer
+            example: 429
+          errorMessage:
+            type: string
+            example: Too many requests
             
     LegalEntity:
       type: string
