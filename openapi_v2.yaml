@@ -1,0 +1,1152 @@
+openapi: 3.0.3
+info:
+  title: ERP REST API
+  version: 0.1.0
+paths:
+  /api/services/v1/operations/getping:
+    post:
+      summary: Alive check
+      description: When system is alive, returns "pong"
+      security: []
+      responses:
+        200:
+          description: Successful Response
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: pong
+      tags:
+        - operations
+        
+  /{tenant_id}/oauth2/token:
+    post:
+      parameters:
+        - in: path
+          name: tenant_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ""
+      
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              allOf:
+              - type: object
+                required:
+                  - grant_type
+                  - client_id
+                  - client_secret
+                properties:
+                  grant_type:
+                    type: string
+                    default: "client_credentials"
+                    description: ""
+                  client_id:
+                    type: string
+                    format: uuid
+                    description: ""
+                  client_secret:
+                    type: string
+                    description: ""
+      
+      summary: Token endpoint
+      security: []
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                - type: object
+                  properties:
+                    token_type:
+                      type: string
+                      default: Bearer
+                    expires_in:
+                      type: string
+                      default: "3599"
+                    ext_expires_in:
+                      type: string
+                      default: "3599"
+                    expires_on:
+                      type: string
+                      default: "1612266407"
+                    not_before:
+                      type: string
+                      default: "1612262507"
+                    resource:
+                      type: string
+                      format: uuid
+                      default: "57a583fa-240e-4c4d-abea-ad3fec4383ca"
+                    access_token:
+                      type: string
+                      default: "sdnMMASNDjds23154ASdKkh"
+                    
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                allOf:
+                - type: object
+                  properties:
+                    error:
+                      type: string
+                      default: "Invalid request"
+                    error_description:
+                      type: string
+                      default: "Tenant not found"
+                    error_codes:
+                      type: array
+                      items: 
+                        type: integer
+                        default: 90002
+                    timestamp:
+                      type: string
+                      format: datetime
+                      default: "2021-02-02 11:49:50Z"
+                    trace_id:
+                      type: string
+                      format: uuid
+                      default: "6d70aa6f-ba7a-4c6e-b2fd-ab75242043e6"
+                    correlation_id:
+                      type: string
+                      format: uuid
+                      default: "57a583fa-240e-4c4d-abea-ad3fec4383ca"
+                    error_uri:
+                      type: string
+                      default: "https://login.microsoftonline.com/error?code=90002"
+      tags:
+        - operations
+
+
+
+  /api/services/v1/invoices/checkinvoiceinpdf:
+    post:
+      summary: Checks existence of generated invoice in PDF
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/PaymentReferenceWithType'
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema: 
+                allOf:
+                - type: object
+                  required:
+                    - statusCode
+                  properties:
+                    statusCode:
+                      type: integer
+                      example: 200
+                    "$id":
+                      type: string
+                      example: "1"
+        404:
+          description: Invoice not found
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ErrorMessage'
+        412:
+          description: Validation failed
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ErrorValidationMessage'
+        429:
+          description: Service overload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOverload'
+                  
+                  
+      description: Returns no body content, only checks existence of invoice
+      tags:
+       - invoices
+       
+  /api/services/v1/invoices/getinvoicedata:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/PaymentReferenceWithType'
+      summary: Download invoice data
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema: 
+                allOf:
+                  - $ref: '#/components/schemas/Invoice'
+                  - type: object
+                    required:
+                      - statusCode
+                    properties:
+                      statusCode:
+                        type: integer
+                        example: 200
+        404:  
+          description: "Error response from ERP, but this statusCode is not http status code"
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ErrorMessage'
+        412:
+          description: Validation failed
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ErrorValidationMessage'
+        429:
+          description: Service overload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOverload'
+      tags:
+        - invoices
+  
+  /api/services/v1/invoices/getinvoicedatapdf:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/PaymentReferenceWithType'
+      summary: Download invoice data with PDF
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema: 
+                allOf:
+                  - $ref: '#/components/schemas/InvoicePDF'
+                  - type: object
+                    required:
+                      - statusCode
+                    properties:
+                      statusCode:
+                        type: integer
+                        example: 200
+        404:
+          description: "Error response from ERP, but this statusCode is not http status code"
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ErrorMessage'
+        412:
+          description: Validation failed
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ErrorValidationMessage'
+        429:
+          description: Service overload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOverload'
+      tags:
+        - invoices
+  
+  /api/services/v1/invoices/getcustomerinvoice:
+    post:
+      summary: Filter invoices, return invoice data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/CustomerIdWithType'
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema: 
+                allOf:
+                  - type: object
+                    required:
+                      - invoices
+                    properties:
+                      "$id":
+                        type: string
+                        example: "1"
+                      invoices:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Invoice'
+        404:
+          description: "Error response from ERP, but this statusCode is not http status code"
+          content:
+            application/json:
+              schema: 
+                allOf:
+                - $ref: '#/components/schemas/ErrorMessage'
+                - type: object
+                  properties:
+                    errorMessage:
+                      type: string
+                      example: Customer id not found
+        412:
+          description: Validation failed
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ErrorValidationMessage'
+        429:
+          description: Service overload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOverload'
+            
+      tags:
+        - invoices
+
+  /api/services/v1/invoices/createinvoice:
+    post:
+      summary: Creates new invoice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/InvoiceInput'
+      responses:
+        200:
+          description: Invoice created
+          content:
+            application/json:
+              schema: 
+                allOf:
+                - $ref: '#/components/schemas/Invoice'
+                - type: object
+                  required:
+                    - statusCode
+                  properties:
+                    statusCode:
+                      type: integer
+                      example: 200
+        412:
+          description: Validation failed
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ErrorValidationMessage'
+        404:
+          description: "Error response from ERP, but this statusCode is not http status code"
+          content:
+            application/json:
+              schema: 
+                allOf:
+                - $ref: '#/components/schemas/ErrorMessage'
+                - type: object
+                  properties:
+                    errorMessage:
+                      type: string
+                      example: Invoice not created
+        409:
+          description: "Error response from ERP, but this statusCode is not http status code"
+          content:
+            application/json:
+              schema: 
+                allOf:
+                - $ref: '#/components/schemas/ErrorMessage'
+                - type: object
+                  properties:
+                    statusCode:
+                      type: integer
+                      example: 409
+                    errorMessage:
+                      type: string
+                      example: Invoice already exists
+        429:
+          description: Service overload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOverload'
+      tags:
+         - invoices
+
+  /api/services/v1/invoices/cancelproformainvoice:
+    post:
+      summary: Cancels ProForma invoices
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/PaymentReference'
+      responses:
+        200:
+          description: Invoice canceled
+          content:
+            application/json:
+              schema:
+                allOf:
+                - type: object
+                  required:
+                    - statusCode
+                  properties:
+                    statusCode:
+                      type: integer
+                      example: 200
+                    "$id":
+                      type: string
+                      example: "1"
+                  
+        404:
+          description: "Error response from ERP, but this statusCode is not http status code"
+          content:
+            application/json:
+              schema: 
+                allOf:
+                - $ref: '#/components/schemas/ErrorMessage'
+                - type: object
+                  properties:
+                    errorMessage:
+                      type: string
+                      example: Proforma not found
+        410:
+          description: "Error response from ERP, but this statusCode is not http status code"
+          content:
+            application/json:
+              schema: 
+                allOf:
+                - $ref: '#/components/schemas/ErrorMessage'
+                - type: object
+                  properties:
+                    statusCode:
+                      type: integer
+                      example: 410
+                    errorMessage:
+                      type: string
+                      example: Proforma invoice with payment reference ID 100000075 cannot be canceled because it is partially or completely paid.
+        412:
+          description: Validation failed
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ErrorValidationMessage'
+        429:
+          description: Service overload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOverload'
+      tags:
+         - invoices
+
+ 
+ 
+  /api/services/v1/customers/getcustomerdata:
+    post:
+      summary: Get customers from ERP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              allOf:
+                - type: object
+                  properties:
+                    _data:
+                      type: object
+                      required:
+                        - legalEntity
+                      properties:
+                        legalEntity:
+                          $ref: '#/components/schemas/LegalEntity'
+                        identificationNumber:
+                          type: string
+                          description: identificationNumber IC
+                          example: '123456789'
+                        customerIds:
+                          type: array
+                          items:
+                            type: string
+                            format: UUID
+                          description: Array of customer IDs
+                          example: ['e3859320-adf4-44e0-8ef2-ae2c5c438f74','b4b78101-534b-4453-9528-e6130eecfeaa']
+      responses:
+          200:
+            description: Successful Response
+            content:
+              application/json:
+                schema:
+                  allOf:
+                    - type: object
+                      required:
+                        - customers
+                      properties:
+                        "$id":
+                          type: string
+                          example: "1"
+                        customers:
+                          type: array
+                          items:
+                            $ref: '#/components/schemas/Customer'
+          404:
+            description: "Error response from ERP, but this statusCode is not http status code"
+            content:
+              application/json:
+                schema: 
+                  allOf:
+                  - $ref: '#/components/schemas/ErrorMessage'
+                  - type: object
+                    properties:
+                      errorMessage:
+                        type: string
+                        example: Customer not found
+          412:
+            description: Validation failed
+            content:
+              application/json:
+                schema: 
+                  $ref: '#/components/schemas/ErrorValidationMessage'
+          429:
+            description: Service overload
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorOverload'
+      tags:
+       - customers
+  
+  /api/services/v1/customers/createcustomer:
+    post:
+      summary: Create customer in ERP
+      requestBody:
+        description: Optional description in *Markdown*
+        required: true
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/CustomerInput'
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema: 
+                allOf:
+                  - $ref: '#/components/schemas/Customer'
+                  - type: object
+                    required:
+                      - customerId
+                      - statusCode
+                    properties:
+                      customerId: 
+                        type: string
+                        format: uuid
+                        description: ERP guid
+                        example: 67f65327-6ff5-4d2d-a967-7987773dbc5b
+                      statusCode:
+                        type: integer
+                        example: 200
+        412:
+          description: Validation failed
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ErrorValidationMessage'
+        404:
+          description: "Error response from ERP, but this statusCode is not http status code"
+          content:
+            application/json:
+              schema: 
+                allOf:
+                - $ref: '#/components/schemas/ErrorMessage'
+                - type: object
+                  properties:
+                    errorMessage:
+                      type: string
+                      example: Customer not created
+        409:
+          description: "Error response from ERP, but this statusCode is not http status code"
+          content:
+            application/json:
+              schema: 
+                allOf:
+                - $ref: '#/components/schemas/ErrorMessage'
+                - type: object
+                  properties:
+                    statusCode:
+                      type: integer
+                      example: 409
+                    errorMessage:
+                      type: string
+                      example: Customer already exists
+        429:
+          description: Service overload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOverload'
+      tags:
+       - customers
+  
+  /api/services/v1/customers/getcustomerbyid:
+    post:
+      summary: Get one customer from ERP
+      requestBody:
+        description: ERP guid
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerId'
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema: 
+                allOf:
+                  - $ref: '#/components/schemas/Customer'
+                  - type: object
+                    required:
+                      - statusCode
+                    properties:
+                      statusCode:
+                        type: integer
+                        example: 200
+                      customerId: 
+                        type: string
+                        format: uuid
+                        description: ERP guid
+                        example: 67f65327-6ff5-4d2d-a967-7987773dbc5b
+        404:
+          description: "Error response from ERP, but this statusCode is not http status code"
+          content:
+            application/json:
+              schema: 
+                allOf:
+                - $ref: '#/components/schemas/ErrorMessage'
+                - type: object
+                  properties:
+                    errorMessage:
+                      type: string
+                      example: Customer not found
+        412:
+          description: Validation failed
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ErrorValidationMessage'
+        429:
+          description: Service overload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOverload'
+      tags:
+       - customers
+
+
+
+components:
+  schemas:
+    CustomerInput:
+      allOf:
+      - type: object
+        properties:
+          _data:
+            type: object
+            required:
+              - name
+              - identificationNumber
+              - isVatPayer
+              - street
+              - city
+              - postCode
+              - countryCode
+              - email
+              - legalEntity
+            properties:
+              legalEntity:
+                $ref: '#/components/schemas/LegalEntity'
+              name: 
+                type: string
+                description: Name of the customers company.
+                example: Prvni vzduchoplavecka a.s.
+              identificationNumber:
+                description: Identification number of the customer (IČO)
+                type: string
+                example: "123456789"
+              vatNumber:
+                description: VAT number of the customer (DIČ).
+                type: string
+                example: "10000001"
+              vatIdentificationNumber:
+                description: Slovak IC DIC
+                type: string
+                example: "10000001"
+              street:
+                description: Street from the customers address.
+                type: string
+                example: U plynojemu 69
+              city:
+                description: City from the customers address.
+                type: string
+                example: Pardubice
+              postCode:
+                description: Post code from the customers address.
+                type: string
+                example: "32000"
+              countryCode:
+                description: Code of country from the customers address - ISO 3166-1 alpha-3 - uppercase.
+                format: countryCode
+                type: string
+                example: CZE
+              telephone:
+                description: Customers telephone number with country prefix.
+                format: phone
+                type: string
+                example: "+420605413742"
+              email:
+                description: Customers e-mail address
+                type: string
+                format: email
+                example: kapitan@vzduchoplavecka.cz
+                
+    Customer:
+      allOf:
+      - type: object
+        required:
+          - legalEntity
+          - name
+          - identificationNumber
+          - isVatPayer
+          - street
+          - city
+          - postCode
+          - countryCode
+          - email
+          - customerId
+        properties:
+          legalEntity:
+            $ref: '#/components/schemas/LegalEntity'
+          name: 
+            type: string
+            description: Name of the customers company.
+            example: Prvni vzduchoplavecka a.s.
+          isActive:
+            type: boolean
+            description: When customer is manual checked -> marked as true
+            example: true
+          identificationNumber:
+            description: Identification number of the customer (IČO)
+            type: string
+            example: "123456789"
+          vatNumber:
+            description: VAT number of the customer (DIČ).
+            type: string
+            example: "10000001"
+          vatIdentificationNumber:
+            description: Slovak IC DIC
+            type: string
+            example: "10000001"
+          street:
+            description: Street from the customers address.
+            type: string
+            example: U plynojemu 69
+          city:
+            description: City from the customers address.
+            type: string
+            example: Pardubice
+          postCode:
+            description: Post code from the customers address.
+            type: string
+            example: "32000"
+          countryCode:
+            description: Code of country from the customers address - ISO 3166-1 alpha-3 - uppercase.
+            format: countryCode
+            type: string
+            example: CZE
+          telephone:
+            description: Customers telephone number with country prefix.
+            format: phone
+            type: string
+            example: "+420605413742"
+          email:
+            description: Customers e-mail address
+            type: string
+            format: email
+            example: kapitan@vzduchoplavecka.cz
+          customerId: 
+            type: string
+            format: uuid
+            description: ERP guid
+            example: 67f65327-6ff5-4d2d-a967-7987773dbc5b
+          
+              
+    InvoiceInput:
+      allOf:
+      - type: object
+        required:
+          - _data
+        properties:
+          _data:
+            required:
+              - legalEntity
+              - customer
+              - paymentReferenceId
+              - currency
+              - countryCode
+              - type
+              - customerId
+              - items
+            properties:
+              legalEntity:
+                $ref: '#/components/schemas/LegalEntity'
+              paymentReferenceId:
+                type: integer
+                description: "Variable symbol"
+                example: 120004565
+              currency:
+                description: Three letter currency code by  ISO 4217 
+                type: string
+                example: CZK
+              countryCode:
+                description: Code of country - ISO 3166-1 alpha-3 - uppercase.
+                format: countryCode
+                type: string
+                example: CZE
+              type: 
+                type: string
+                description: Payment source
+                enum:
+                  - autopay
+                  - manual
+                  - paybylink
+                  - banktransfer
+                  - backwardinvoicing
+                  - shoppingcart
+                example: autopay
+              customerId:
+                type: string
+                format: uuid
+                description: GUID from ERP
+                example: '028e12d1-be7a-4913-b797-7e848c4e4977'
+              items:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    text:
+                      type: string
+                      example: Dobití kreditu do PPC systému Heureka.cz
+                    amount:
+                      type: string
+                      format: Decimal
+                      description: Price without VAT
+                      example: "10.50"
+              createdDate:
+                type: string
+                format: date
+                description: "Date (datum vytvoreni) ISO 8601"
+                example: '2012-04-23T18:25:43.511Z'
+              dueDate:
+                type: string
+                format: date
+                description: "Date (termin splatnosti) ISO 8601"
+                example: '2012-04-23T18:25:43.511Z'
+      
+    Invoice:
+      allOf:
+      - type: object
+        required:
+          - legalEntity
+          - paymentReferenceId
+          - currency
+          - countryCode
+          - type
+          - customerId
+          - items
+          - amount
+          - amountVat
+          - status
+          - createdDate
+          - dueDate
+        properties:
+          legalEntity:
+            $ref: '#/components/schemas/LegalEntity'
+          paymentReferenceId:
+            type: integer
+            description: "Variable symbol"
+            example: 120004565
+          currency:
+            description: Three letter currency code by  ISO 4217 
+            type: string
+            example: CZK
+          countryCode:
+            description: Code of country - ISO 3166-1 alpha-3 - uppercase.
+            format: countryCode
+            type: string
+            example: CZE
+          type: 
+            type: string
+            description: Payment source
+            enum:
+              - autopay
+              - manual
+              - paybylink
+              - banktransfer
+              - backwardinvoicing
+              - shoppingcart
+            example: autopay
+          customerId:
+            type: string
+            format: uuid
+            description: GUID from ERP
+            example: '028e12d1-be7a-4913-b797-7e848c4e4977'
+          items:
+            type: array
+            items:
+              type: object
+              properties:
+                text:
+                  type: string
+                  example: Dobití kreditu do PPC systému Heureka.cz
+                amount:
+                  type: string
+                  format: Decimal
+                  description: Price without VAT
+                  example: "10.50"
+          amount:
+            type: string
+            format: Decimal
+            description: Price without VAT
+            example: "10.50"
+          amountVat:
+            type: string
+            format: Decimal
+            description: Price with VAT
+            example: "12.50"
+          status:
+            type: string
+            description: Invoice payment status
+            enum:
+              - paid
+              - partially
+              - unpaid
+          createdDate:
+            type: string
+            format: date
+            description: "Date (datum vytvoreni) ISO 8601"
+            example: '2012-04-23T18:25:43.511Z'
+          dueDate:
+            type: string
+            format: date
+            description: "Date (termin splatnosti) ISO 8601"
+            example: '2012-04-23T18:25:43.511Z'
+
+    InvoicePDF:
+      allOf:
+      - $ref: '#/components/schemas/Invoice'
+      - type: object
+        required:
+          - pdf
+        properties:
+          pdf: 
+            type: string
+            format: byte
+            description: Base64-encoded contents invoice PDF
+            example: UERG
+            
+    
+    PaymentReference:
+      allOf:
+      - type: object
+        properties:
+          _data:
+            type: object
+            required:
+              - legalEntity
+              - paymentReferenceId
+              - type
+            properties:
+              legalEntity:
+                $ref: '#/components/schemas/LegalEntity'
+              paymentReferenceId:
+                type: integer
+                description: Variable symbol
+                example: 412354654
+    
+    PaymentReferenceWithType:
+      allOf:
+      - type: object
+        properties:
+          _data:
+            type: object
+            required:
+              - legalEntity
+              - paymentReferenceId
+              - type
+            properties:
+              legalEntity:
+                $ref: '#/components/schemas/LegalEntity'
+              paymentReferenceId:
+                type: integer
+                description: Variable symbol
+                example: 412354654
+              type:
+                description: Decision of invoice type - default value "invoice"
+                type: string
+                enum:
+                  - proforma
+                  - invoice
+                default: invoice
+            
+    CustomerIdWithType:
+      allOf:
+      - type: object
+        properties:
+          _data:
+            type: object
+            required:
+              - legalEntity
+              - customerId
+            properties:
+              legalEntity:
+                $ref: '#/components/schemas/LegalEntity'
+              customerId:
+                type: string
+                format: uuid
+                example: '028e12d1-be7a-4913-b797-7e848c4e4977'
+              type:
+                description: Decision of invoice type - default value "invoice"
+                type: string
+                enum:
+                  - proforma
+                  - invoice
+                default: invoice
+            description: GUID from ERP
+            
+    CustomerId:
+      allOf:
+      - type: object
+        properties:
+          _data:
+            type: object
+            required:
+              - legalEntity
+              - customerId
+            properties:
+              legalEntity:
+                $ref: '#/components/schemas/LegalEntity'
+              customerId:
+                type: string
+                format: uuid
+                example: '028e12d1-be7a-4913-b797-7e848c4e4977'
+            description: GUID from ERP
+    
+    IdentificationNumber:
+      allOf:
+      - type: object
+        properties:
+          _data:
+            type: object
+            required:
+              - legalEntity
+              - identificationNumber
+            properties:
+              legalEntity:
+                $ref: '#/components/schemas/LegalEntity'
+              identificationNumber:
+                type: string
+                description: identificationNumber IC
+                example: '123456789'
+                
+    ErrorMessage:
+      allOf:
+      - type: object
+        required:
+          - statusCode
+          - errorMessage
+        properties:
+          statusCode:
+            type: integer
+            description: Error statusCode from ERP
+            example: 404
+          errorMessage:
+            type: string
+            description: Error message from ERP
+            example: Invoice not found
+          "$id":
+            type: string
+            description: Error id
+            example: "1"
+                
+    ErrorValidationMessage:
+      allOf:
+      - $ref: '#/components/schemas/ErrorMessage'
+      - type: object
+        required:
+          - statusCode
+          - errorMessage
+        properties:
+          statusCode:
+            type: integer
+            description: Error statusCode from ERP
+            example: 412
+          errorMessage:
+            type: string
+            description: Error message from ERP
+            example: LegalEntity is not valid
+            
+    ErrorOverload:
+      allOf:
+      - $ref: '#/components/schemas/ErrorMessage'
+      - type: object
+        properties:
+          statusCode:
+            type: integer
+            example: 429
+          errorMessage:
+            type: string
+            example: Too many requests
+            
+    LegalEntity:
+      type: string
+      description: Legal Entity of Company
+      enum:
+        - HEG
+        - HEF
+        - OCS
+        - CEN
+        - SMI
+        - DTW
+
+  securitySchemes:
+    oAuth2:
+      type: oauth2
+      description: This API uses OAuth 2 with the implicit grant flow. [More info](https://api.example.com/docs/auth)
+      flows:
+        clientCredentials:
+          tokenUrl: "/api/services/v1/operations/token"
+          scopes: {}
+
+security:
+  - oAuth2: []
