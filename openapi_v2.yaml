@@ -1141,9 +1141,10 @@ components:
       enum:
         - HEG
         - HEF
-        - CEN
         - OCS
-        - DWS
+        - CEN
+        - SMI
+        - DTW
         
 
 
