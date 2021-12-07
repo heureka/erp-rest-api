@@ -1,7 +1,8 @@
 openapi: 3.0.3
 info:
   title: ERP REST API
-  version: 0.1.0
+  description: "**ERP REST API** specification for 2. rollout" 
+  version: 0.2.0
 paths:
   /api/services/v1/operations/getping:
     post:
@@ -886,6 +887,7 @@ components:
           - items
           - amount
           - amountVat
+          - amountToPay
           - status
           - createdDate
           - dueDate
@@ -944,6 +946,11 @@ components:
             format: Decimal
             description: Price with VAT
             example: "12.50"
+          amountToPay:
+            type: string
+            format: Decimal
+            description: Remaining amount to be paid
+            example: "8.50"
           status:
             type: string
             description: Invoice payment status
@@ -1134,10 +1141,11 @@ components:
       enum:
         - HEG
         - HEF
-        - OCS
         - CEN
-        - SMI
-        - DTW
+        - OCS
+        - DWS
+        
+
 
   securitySchemes:
     oAuth2:
