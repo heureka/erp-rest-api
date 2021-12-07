@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: ERP REST API
+  title: ERP REST API New
   description: "**ERP REST API** specification for 2. rollout" 
   version: 0.2.0
 paths:
