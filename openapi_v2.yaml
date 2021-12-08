@@ -825,6 +825,10 @@ components:
                 type: integer
                 description: "Variable symbol"
                 example: 120004565
+              customerOrderNr:
+                type: string
+                maximum: 20
+                description: Customer request form
               currency:
                 description: Three letter currency code by  ISO 4217 
                 type: string
@@ -854,6 +858,11 @@ components:
                 type: array
                 items:
                   type: object
+                  required:
+                    - text
+                    - amount
+                    - unit
+                    - lineNote
                   properties:
                     text:
                       type: string
@@ -863,6 +872,21 @@ components:
                       format: Decimal
                       description: Price without VAT
                       example: "10.50"
+                    unit:
+                      type: integer
+                      description: Number of the amounts for the same item (It can be higher or less than zero)
+                    aProfitCenter:
+                      description: "Code of country - ISO 3166-1 alpha-3 - uppercase.
+                      
+                      
+                      If the element is empty, then it will be found in 'Integration settings' according to rest API = 'type/countryCode'"
+                      format: countryCode
+                      type: string
+                      example: CZE
+                    lineNote:
+                      type: string
+                      description: "Note text field size is not limited, we recommend a maximum of 250 characters"
+                        
               createdDate:
                 type: string
                 format: date
@@ -927,6 +951,10 @@ components:
             type: array
             items:
               type: object
+              required:
+                - text
+                - amount
+                - unit
               properties:
                 text:
                   type: string
@@ -936,6 +964,9 @@ components:
                   format: Decimal
                   description: Price without VAT
                   example: "10.50"
+                unit:
+                  type: integer
+                  description: Number of the amounts for the same item (It can be higher or less than zero)
           amount:
             type: string
             format: Decimal
