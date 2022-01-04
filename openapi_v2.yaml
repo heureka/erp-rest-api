@@ -663,6 +663,107 @@ paths:
                 $ref: '#/components/schemas/ErrorOverload'
       tags:
        - customers
+  
+  /api/services/v1/customers/getpartnerdata:
+    post:
+      summary: Get list of partners stored in Global Address Book
+      requestBody:
+        description: Identification Number of partners
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - "_data"
+              properties:
+                "_data":
+                  type: object
+                  required:
+                    - identificationNumber
+                  properties:
+                    identificationNumber:
+                      type: string
+                      example: "12345678"
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  "$id":
+                    type: integer
+                    example: 0
+                  partners:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        partyId:
+                          type: string
+                          example: "0011223344"
+                          description: Partner ID specifies universal number of partner stored in Global Address Book
+                        name:
+                          type: string
+                          example: "První vzduchoplavecká a.s."
+                        isActive:
+                          type: boolean
+                          example: true
+                        identificationNumber:
+                          type: string
+                          example: "12345678"
+                        vatNumber:
+                          type: string
+                          example: "CZ12345678"
+                        vatIdentificationNumber:
+                          type: string
+                          example: "12345678-11-22"
+                        street: 
+                          type: string
+                          example: "U plynojemu 69"
+                          description: Name of street with house number
+                        city:
+                          type: string
+                          example: "Pardubice"
+                          description: City name
+                        postCode:
+                          type: string
+                          example: 32000
+                          description: Postal code 
+                        countryCode: 
+                          description: Code of country - ISO 3166-1 alpha-3 - uppercase.
+                          format: countryCode
+                          type: string
+                          example: CZE
+                          
+        404:
+          description: "Error response from ERP, but this statusCode is not http status code"
+          content:
+            application/json:
+              schema: 
+                allOf:
+                - $ref: '#/components/schemas/ErrorMessage'
+                - type: object
+                  properties:
+                    errorMessage:
+                      type: string
+                      example: Partner not found
+        412:
+          description: Validation failed
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ErrorValidationMessage'
+        429:
+          description: Service overload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorOverload'
+      tags:
+       - customers
 
 
 
@@ -730,6 +831,10 @@ components:
                 type: string
                 format: email
                 example: kapitan@vzduchoplavecka.cz
+              partyId:
+                type: string
+                example: "0011223344"
+                description: Optional value that is filled only when is there any partner in Global Address Book with the same identificationNumber.
                 
     Customer:
       allOf:
