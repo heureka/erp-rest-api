@@ -755,7 +755,13 @@ paths:
           content:
             application/json:
               schema: 
-                $ref: '#/components/schemas/ErrorValidationMessage'
+                allOf:
+                - $ref: '#/components/schemas/ErrorValidationMessage'
+                - type: object
+                  properties:
+                    errorMessage:
+                      type: string
+                      example: Identification number is not valid
         429:
           description: Service overload
           content:
