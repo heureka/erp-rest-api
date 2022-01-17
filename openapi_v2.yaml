@@ -1011,6 +1011,9 @@ components:
                     lineNote:
                       type: string
                       description: "Note text field size is not limited, we recommend a maximum of 250 characters"
+                    itemType:
+                      type: string
+                      description: "PPC/H204/etc..."
                         
               accountingDate:
                 type: string
@@ -1121,6 +1124,9 @@ components:
                 unit:
                   type: integer
                   description: Number of the amounts for the same item (It can be higher or less than zero)
+                itemType:
+                  type: string
+                  description: "PPC/H204/etc..."
           amount:
             type: string
             format: Decimal
