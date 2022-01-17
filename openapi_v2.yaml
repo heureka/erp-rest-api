@@ -936,6 +936,14 @@ components:
                 type: integer
                 description: "Variable symbol"
                 example: 120004565
+              originalInvoiceNr:
+                type: string
+                maxLength: 20
+                example: 202020
+              invoiceNote:
+                type: string
+                description: "Note on the invoice header"
+                example: "Text do záhlaví faktury"
               customerOrderNr:
                 type: string
                 maximum: 20
@@ -960,6 +968,12 @@ components:
                   - backwardinvoicing
                   - shoppingcart
                 example: autopay
+              invoiceType:
+                type: string
+                enum:
+                  - empty
+                  - credit
+                  - cancel
               customerId:
                 type: string
                 format: uuid
@@ -998,7 +1012,17 @@ components:
                       type: string
                       description: "Note text field size is not limited, we recommend a maximum of 250 characters"
                         
-              createdDate:
+              accountingDate:
+                type: string
+                format: date
+                description: "Date (datum vytvoreni) ISO 8601; *old* createdDate -> *new* accountingDate"
+                example: '2012-04-23T18:25:43.511Z'
+              vatDate:
+                type: string
+                format: date
+                description: "Date (datum vytvoreni) ISO 8601"
+                example: '2012-04-23T18:25:43.511Z'
+              documentDate:
                 type: string
                 format: date
                 description: "Date (datum vytvoreni) ISO 8601"
@@ -1015,16 +1039,21 @@ components:
         required:
           - legalEntity
           - paymentReferenceId
+          - originalInvoiceNr
+          - invoiceNote
           - currency
           - countryCode
           - type
+          - invoiceType
           - customerId
           - items
           - amount
           - amountVat
           - amountToPay
           - status
-          - createdDate
+          - accountingDate
+          - vatDate
+          - documentDate
           - dueDate
         properties:
           legalEntity:
@@ -1033,6 +1062,14 @@ components:
             type: integer
             description: "Variable symbol"
             example: 120004565
+          originalInvoiceNr:
+            type: string
+            maxLength: 20
+            example: 202020
+          invoiceNote:
+            type: string
+            description: "Note on the invoice header"
+            example: "Text do záhlaví faktury"
           currency:
             description: Three letter currency code by  ISO 4217 
             type: string
@@ -1053,6 +1090,12 @@ components:
               - backwardinvoicing
               - shoppingcart
             example: autopay
+          invoiceType:
+            type: string
+            enum:
+              - empty
+              - credit
+              - cancel
           customerId:
             type: string
             format: uuid
@@ -1100,7 +1143,17 @@ components:
               - paid
               - partially
               - unpaid
-          createdDate:
+          accountingDate:
+            type: string
+            format: date
+            description: "Date (datum vytvoreni) ISO 8601; *old* createdDate -> *new* accountingDate"
+            example: '2012-04-23T18:25:43.511Z'
+          vatDate:
+            type: string
+            format: date
+            description: "Date (datum vytvoreni) ISO 8601"
+            example: '2012-04-23T18:25:43.511Z'
+          documentDate:
             type: string
             format: date
             description: "Date (datum vytvoreni) ISO 8601"
