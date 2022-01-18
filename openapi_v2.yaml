@@ -926,7 +926,7 @@ components:
               - paymentReferenceId
               - currency
               - countryCode
-              - type
+              - paymentType
               - customerId
               - items
             properties:
@@ -957,7 +957,7 @@ components:
                 format: countryCode
                 type: string
                 example: CZE
-              type: 
+              paymentType: 
                 type: string
                 description: Payment source
                 enum:
@@ -1043,10 +1043,9 @@ components:
           - legalEntity
           - paymentReferenceId
           - originalInvoiceNr
-          - invoiceNote
           - currency
           - countryCode
-          - type
+          - paymentType
           - invoiceType
           - customerId
           - items
@@ -1069,10 +1068,6 @@ components:
             type: string
             maxLength: 20
             example: 202020
-          invoiceNote:
-            type: string
-            description: "Note on the invoice header"
-            example: "Text do záhlaví faktury"
           currency:
             description: Three letter currency code by  ISO 4217 
             type: string
@@ -1082,7 +1077,7 @@ components:
             format: countryCode
             type: string
             example: CZE
-          type: 
+          paymentType: 
             type: string
             description: Payment source
             enum:
