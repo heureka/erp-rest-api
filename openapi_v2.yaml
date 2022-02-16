@@ -699,44 +699,7 @@ paths:
                   partners:
                     type: array
                     items:
-                      type: object
-                      properties:
-                        partyId:
-                          type: string
-                          example: "0011223344"
-                          description: Partner ID specifies universal number of partner stored in Global Address Book
-                        name:
-                          type: string
-                          example: "První vzduchoplavecká a.s."
-                        isActive:
-                          type: boolean
-                          example: true
-                        identificationNumber:
-                          type: string
-                          example: "12345678"
-                        vatNumber:
-                          type: string
-                          example: "CZ12345678"
-                        vatIdentificationNumber:
-                          type: string
-                          example: "12345678-11-22"
-                        street: 
-                          type: string
-                          example: "U plynojemu 69"
-                          description: Name of street with house number
-                        city:
-                          type: string
-                          example: "Pardubice"
-                          description: City name
-                        postCode:
-                          type: string
-                          example: 32000
-                          description: Postal code 
-                        countryCode: 
-                          description: Code of country - ISO 3166-1 alpha-3 - uppercase.
-                          format: countryCode
-                          type: string
-                          example: CZE
+                      $ref: '#/components/schemas/Partner'
                           
         404:
           description: "Error response from ERP, but this statusCode is not http status code"
@@ -805,11 +768,14 @@ components:
               vatNumber:
                 description: VAT number of the customer (DIČ).
                 type: string
-                example: "10000001"
+                example: "123456789"
               vatIdentificationNumber:
-                description: Slovak IC DIC
                 type: string
-                example: "10000001"
+                example: "SK1234567890"
+              generalTaxId:
+                type: string
+                example: "12345678-11-22"
+                description: "Mainly used in OCS"
               street:
                 description: Street from the customers address.
                 type: string
@@ -874,11 +840,14 @@ components:
           vatNumber:
             description: VAT number of the customer (DIČ).
             type: string
-            example: "10000001"
+            example: "123456789"
           vatIdentificationNumber:
-            description: Slovak IC DIC
             type: string
-            example: "10000001"
+            example: "SK1234567890"
+          generalTaxId:
+            type: string
+            example: "12345678-11-22"
+            description: "Mainly used in OCS"
           street:
             description: Street from the customers address.
             type: string
@@ -911,6 +880,51 @@ components:
             format: uuid
             description: ERP guid
             example: 67f65327-6ff5-4d2d-a967-7987773dbc5b
+            
+    Partner:
+      type: object
+      properties:
+        partyId:
+          type: string
+          example: "0011223344"
+          description: Partner ID specifies universal number of partner stored in Global Address Book
+        name:
+          type: string
+          example: "První vzduchoplavecká a.s."
+        identificationNumber:
+          type: string
+          example: "12345678"
+        vatNumber:
+          type: string
+          example: "CZ12345678"
+        vatIdentificationNumber:
+          type: string
+          example: "SK1234567890"
+        generalTaxId:
+          type: string
+          example: "12345678-11-22"
+          description: "Mainly used in OCS"
+        street: 
+          type: string
+          example: "U plynojemu 69"
+          description: Name of street with house number
+        city:
+          type: string
+          example: "Pardubice"
+          description: City name
+        postCode:
+          type: string
+          example: 32000
+          description: Postal code 
+        countryCode: 
+          description: Code of country - ISO 3166-1 alpha-3 - uppercase.
+          format: countryCode
+          type: string
+          example: CZE
+        isActive:
+          type: boolean
+          example: true
+        
           
               
     InvoiceInput:
@@ -988,6 +1002,7 @@ components:
                     - amount
                     - unit
                     - lineNote
+                    - itemVatGroup
                   properties:
                     text:
                       type: string
@@ -1000,6 +1015,7 @@ components:
                     unit:
                       type: integer
                       description: Number of the amounts for the same item (It can be higher or less than zero)
+                      example: 1
                     aProfitCenter:
                       description: "Code of country - ISO 3166-1 alpha-3 - uppercase.
                       
@@ -1014,7 +1030,11 @@ components:
                     itemType:
                       type: string
                       description: "PPC/H204/etc..."
-                        
+                      example: "PPC"
+                    itemVatGroup:
+                      type: string
+                      description: "item sales tax group (=code, for example “DEF27”)"
+                      example: "DEF27"
               accountingDate:
                 type: string
                 format: date
