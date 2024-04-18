@@ -1,0 +1,3272 @@
+openapi: 3.1.0
+info:
+  title: ERP Wrapper v2
+  version: 2.1.0
+paths:
+  /v3/invoices/list:
+    get:
+      tags:
+        - invoices v3
+      summary: Get Credit History
+      description: Endpoint used for checking the availability of this service
+      operationId: get_credit_history_v3_invoices_list_get
+      deprecated: true
+      parameters:
+        - name: invoice_number
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+              - type: 'null'
+            title: Invoice Number
+        - name: company
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+              - type: 'null'
+            description: Company ID (UUID)
+            title: Company
+          description: Company ID (UUID)
+        - name: sort_by
+          in: query
+          required: false
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/app__v3__utils__enums__AllowedInvoiceListAttributes'
+            default: document_date
+            title: Sort By
+        - name: sort_order
+          in: query
+          required: false
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Order'
+            default: desc
+            title: Sort Order
+        - name: date_from
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+                format: date-time
+              - type: 'null'
+            title: Date From
+        - name: date_to
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+                format: date-time
+              - type: 'null'
+            title: Date To
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            description: Offset value for paging.
+            examples:
+              - 1
+            default: 1
+            title: Page
+          description: Offset value for paging.
+        - name: page_size
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            description: Limit value for paging.
+            examples:
+              - 10
+            default: 20
+            title: Page Size
+          description: Limit value for paging.
+        - name: token
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+            description: Service token (for integration of new services, send request to **#one-b2b-payment-requests**)
+            title: Token
+          description: Service token (for integration of new services, send request to **#one-b2b-payment-requests**)
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/app__common__schemes__base__TableResponse_InvoiceListItem_InvoiceListFilters___1'
+        '401':
+          description: '`Unauthorized` The token is incorrect'
+        '404':
+          description: '`Failed` Invoice not found'
+        '410':
+          description: '`ERP unable to Finish`'
+        '412':
+          description: '`ERP Validation Error`'
+        '417':
+          description: '`ERP Unavailable`'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v3/invoices/{payment_reference_id}:
+    get:
+      tags:
+        - invoices v3
+      summary: Get Invoice
+      description: Endpoint used for getting invoice by payment reference ID
+      operationId: get_invoice_v3_invoices__payment_reference_id__get
+      deprecated: true
+      parameters:
+        - name: payment_reference_id
+          in: path
+          required: true
+          schema:
+            type: string
+            maxLength: 20
+            description: Variable Symbol
+            examples:
+              - '1234567890'
+            title: Payment Reference Id
+          description: Variable Symbol
+        - name: legal_entity
+          in: query
+          required: true
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/LegalEntity'
+            description: Legal entity
+            examples:
+              - HEG
+            title: Legal Entity
+          description: Legal entity
+        - name: invoice_type
+          in: query
+          required: false
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/DocumentType'
+            description: Type of invoice
+            examples:
+              - invoice
+            default: invoice
+            title: Invoice Type
+          description: Type of invoice
+        - name: include_pdf
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: boolean
+              - type: 'null'
+            description: Include parameter
+            examples:
+              - false
+            default: false
+            title: Include Pdf
+          description: Include parameter
+        - name: token
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+            description: Service token (for integration of new services, send request to **#one-b2b-payment-requests**)
+            title: Token
+          description: Service token (for integration of new services, send request to **#one-b2b-payment-requests**)
+      responses:
+        '200':
+          description: '`Success`'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/app__v3__schemes__invoices__InvoiceResponse'
+        '401':
+          description: '`Unauthorized` The token is incorrect'
+        '404':
+          description: '`Failed` Invoice not found'
+        '410':
+          description: '`ERP unable to Finish`'
+        '412':
+          description: '`ERP Validation Error`'
+        '417':
+          description: '`ERP Unavailable`'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+        - invoices v3
+      summary: Cancel Proforma Invoice
+      description: Endpoint used for deleting invoice by payment reference ID
+      operationId: cancel_proforma_invoice_v3_invoices__payment_reference_id__delete
+      deprecated: true
+      parameters:
+        - name: payment_reference_id
+          in: path
+          required: true
+          schema:
+            type: string
+            maxLength: 20
+            description: Variable Symbol
+            examples:
+              - '1234567890'
+            title: Payment Reference Id
+          description: Variable Symbol
+        - name: legal_entity
+          in: query
+          required: true
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/LegalEntity'
+            description: Legal entity
+            examples:
+              - HEG
+            title: Legal Entity
+          description: Legal entity
+        - name: token
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+            description: Service token (for integration of new services, send request to **#one-b2b-payment-requests**)
+            title: Token
+          description: Service token (for integration of new services, send request to **#one-b2b-payment-requests**)
+      responses:
+        '204':
+          description: '`Success` Proforma invoice canceled'
+        '401':
+          description: '`Unauthorized` The token is incorrect'
+        '404':
+          description: '`Failed` Proforma invoice not found'
+        '410':
+          description: '`ERP unable to Finish`'
+        '412':
+          description: '`ERP Validation Error`'
+        '417':
+          description: '`ERP Unavailable`'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    head:
+      tags:
+        - invoices v3
+      summary: Check Pdf Availability
+      description: Endpoint used for checking the availability of this service
+      operationId: check_pdf_availability_v3_invoices__payment_reference_id__head
+      deprecated: true
+      parameters:
+        - name: payment_reference_id
+          in: path
+          required: true
+          schema:
+            type: string
+            maxLength: 20
+            description: Variable Symbol
+            examples:
+              - '1234567890'
+            title: Payment Reference Id
+          description: Variable Symbol
+        - name: legal_entity
+          in: query
+          required: true
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/LegalEntity'
+            description: Legal entity
+            examples:
+              - HEG
+            title: Legal Entity
+          description: Legal entity
+        - name: invoice_type
+          in: query
+          required: false
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/DocumentType'
+            description: Type of invoice
+            examples:
+              - invoice
+            default: invoice
+            title: Invoice Type
+          description: Type of invoice
+        - name: token
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+            description: Service token (for integration of new services, send request to **#one-b2b-payment-requests**)
+            title: Token
+          description: Service token (for integration of new services, send request to **#one-b2b-payment-requests**)
+      responses:
+        '200':
+          description: '`Success` PDF exists'
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: '`Unauthorized` The token is incorrect'
+        '404':
+          description: '`Failed` PDF doesn''t exist'
+        '410':
+          description: '`ERP unable to Finish`'
+        '412':
+          description: '`ERP Validation Error`'
+        '417':
+          description: '`ERP Unavailable`'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v3/invoices:
+    get:
+      tags:
+        - invoices v3
+      summary: Get All Invoices
+      description: Endpoint used for getting all invoices for a customer
+      operationId: get_all_invoices_v3_invoices_get
+      deprecated: true
+      parameters:
+        - name: customer_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+            description: Customer ID (UUID)
+            examples:
+              - 12345678-1234-5678-1234-567812345678
+            title: Customer Id
+          description: Customer ID (UUID)
+        - name: legal_entity
+          in: query
+          required: true
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/LegalEntity'
+            description: Legal entity
+            examples:
+              - HEG
+            title: Legal Entity
+          description: Legal entity
+        - name: invoice_type
+          in: query
+          required: false
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/DocumentType'
+            description: Type of invoice
+            examples:
+              - invoice
+            default: invoice
+            title: Invoice Type
+          description: Type of invoice
+        - name: token
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+            description: Service token (for integration of new services, send request to **#one-b2b-payment-requests**)
+            title: Token
+          description: Service token (for integration of new services, send request to **#one-b2b-payment-requests**)
+      responses:
+        '200':
+          description: '`Success`'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/app__v3__schemes__invoices__InvoiceResponse'
+                title: Response Get All Invoices V3 Invoices Get
+        '401':
+          description: '`Unauthorized` The token is incorrect'
+        '404':
+          description: '`Failed` Invoice not found'
+        '410':
+          description: '`ERP unable to Finish`'
+        '412':
+          description: '`ERP Validation Error`'
+        '417':
+          description: '`ERP Unavailable`'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      tags:
+        - invoices v3
+      summary: Create Invoice
+      description: Endpoint used for creating invoice
+      operationId: create_invoice_v3_invoices_post
+      deprecated: true
+      parameters:
+        - name: token
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+            description: Service token (for integration of new services, send request to **#one-b2b-payment-requests**)
+            title: Token
+          description: Service token (for integration of new services, send request to **#one-b2b-payment-requests**)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/app__v3__schemes__invoices__InvoiceRequest'
+      responses:
+        '201':
+          description: '`Success`'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/app__v3__schemes__invoices__InvoiceResponse'
+        '401':
+          description: '`Unauthorized` The token is incorrect'
+        '404':
+          description: '`Failed` Invoice not found'
+        '410':
+          description: '`ERP unable to Finish`'
+        '412':
+          description: '`ERP Validation Error`'
+        '417':
+          description: '`ERP Unavailable`'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v3/customers/{customer_id}:
+    get:
+      tags:
+        - customers v3
+      summary: Get Customer
+      description: Get customer by customer ID
+      operationId: get_customer_v3_customers__customer_id__get
+      deprecated: true
+      parameters:
+        - name: customer_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            description: Customer ID
+            title: Customer Id
+          description: Customer ID
+          example: 123e4567-e89b-12d3-a456-426614174000
+        - name: legal_entity
+          in: query
+          required: true
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/LegalEntity'
+            examples:
+              - HEG
+            title: Legal Entity
+        - name: token
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+            description: Service token (for integration of new services, send request to **#one-b2b-payment-requests**)
+            title: Token
+          description: Service token (for integration of new services, send request to **#one-b2b-payment-requests**)
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/app__v3__schemes__customers__CustomerResponse'
+        '401':
+          description: '`Unauthorized` The token is incorrect'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v3/customers:
+    get:
+      tags:
+        - customers v3
+      summary: Get Customers
+      description: Get customers by identification number or array of customer IDs
+      operationId: get_customers_v3_customers_get
+      deprecated: true
+      parameters:
+        - name: legal_entity
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/LegalEntity'
+          example: HEG
+        - name: identification_number
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+              - type: 'null'
+            title: Identification Number
+        - name: customer_ids
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: array
+                items:
+                  type: string
+                  format: uuid
+              - type: 'null'
+            description: Customer IDs array (UUID)
+            title: Customer Ids
+          description: Customer IDs array (UUID)
+        - name: token
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+            description: Service token (for integration of new services, send request to **#one-b2b-payment-requests**)
+            title: Token
+          description: Service token (for integration of new services, send request to **#one-b2b-payment-requests**)
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/app__v3__schemes__customers__CustomerResponse'
+                title: Response Get Customers V3 Customers Get
+        '401':
+          description: '`Unauthorized` The token is incorrect'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      tags:
+        - customers v3
+      summary: Create Customer
+      description: Create a new customer
+      operationId: create_customer_v3_customers_post
+      deprecated: true
+      parameters:
+        - name: token
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+            description: Service token (for integration of new services, send request to **#one-b2b-payment-requests**)
+            title: Token
+          description: Service token (for integration of new services, send request to **#one-b2b-payment-requests**)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/app__v3__schemes__customers__CustomerRequest'
+      responses:
+        '201':
+          description: '`Success`'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/app__v3__schemes__customers__CustomerResponse'
+        '401':
+          description: '`Unauthorized` The token is incorrect'
+        '404':
+          description: '`Failed` Cannot create customer'
+        '409':
+          description: '`Conflict` Customer already exists'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v3/partners/{identification_number}:
+    get:
+      tags:
+        - partners v3
+      summary: Get Partners
+      description: Get partners by identification number from Global Address Book
+      operationId: get_partners_v3_partners__identification_number__get
+      deprecated: true
+      parameters:
+        - name: identification_number
+          in: path
+          required: true
+          schema:
+            type: string
+            description: Identification number
+            examples:
+              - '1234567908'
+            title: Identification Number
+          description: Identification number
+        - name: token
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+            description: Service token (for integration of new services, send request to **#one-b2b-payment-requests**)
+            title: Token
+          description: Service token (for integration of new services, send request to **#one-b2b-payment-requests**)
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/app__v3__schemes__partners__PartnerResponse'
+                title: Response Get Partners V3 Partners  Identification Number  Get
+        '401':
+          description: '`Unauthorized` The token is incorrect'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v4/invoices/list:
+    get:
+      tags:
+        - invoices v4
+      summary: Get Credit History
+      description: Endpoint used for checking the availability of this service
+      operationId: get_credit_history_v4_invoices_list_get
+      security:
+        - Basic HTTP Authentication: []
+      parameters:
+        - name: invoice_number
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+              - type: 'null'
+            title: Invoice Number
+        - name: customer_id
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+                format: uuid
+              - type: 'null'
+            title: Customer Id
+        - name: sort_by
+          in: query
+          required: false
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/app__v4__utils__enums__AllowedInvoiceListAttributes'
+            default: documentDate
+            title: Sort By
+        - name: sort_order
+          in: query
+          required: false
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Order'
+            default: desc
+            title: Sort Order
+        - name: date_issue_from
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+                format: date-time
+              - type: 'null'
+            title: Date Issue From
+        - name: date_issue_to
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+                format: date-time
+              - type: 'null'
+            title: Date Issue To
+        - name: date_paid_from
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+                format: date-time
+              - type: 'null'
+            title: Date Paid From
+        - name: date_paid_to
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+                format: date-time
+              - type: 'null'
+            title: Date Paid To
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            description: Offset value for paging.
+            examples:
+              - 1
+            default: 1
+            title: Page
+          description: Offset value for paging.
+        - name: page_size
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            description: Limit value for paging.
+            examples:
+              - 10
+            default: 20
+            title: Page Size
+          description: Limit value for paging.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/app__common__schemes__base__TableResponse_InvoiceListItem_InvoiceListFilters___2'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              example:
+                detail: Incorrect username or password
+        '404':
+          description: '`Failed` Invoice not found'
+        '410':
+          description: '`ERP unable to Finish`'
+        '412':
+          description: '`ERP Validation Error`'
+        '417':
+          description: '`ERP Unavailable`'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v4/invoices/{payment_reference_id}:
+    get:
+      tags:
+        - invoices v4
+      summary: Get Invoice
+      description: Endpoint used for getting invoice by payment reference ID
+      operationId: get_invoice_v4_invoices__payment_reference_id__get
+      security:
+        - Basic HTTP Authentication: []
+      parameters:
+        - name: payment_reference_id
+          in: path
+          required: true
+          schema:
+            type: string
+            maxLength: 20
+            description: Variable Symbol
+            examples:
+              - '1234567890'
+            title: Payment Reference Id
+          description: Variable Symbol
+        - name: legal_entity
+          in: query
+          required: true
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/LegalEntity'
+            description: Legal entity
+            examples:
+              - HEG
+            title: Legal Entity
+          description: Legal entity
+        - name: document_type
+          in: query
+          required: false
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/DocumentType'
+            description: Type of invoice
+            examples:
+              - invoice
+            default: invoice
+            title: Document Type
+          description: Type of invoice
+        - name: include_pdf
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: boolean
+              - type: 'null'
+            description: Include parameter
+            examples:
+              - false
+            default: false
+            title: Include Pdf
+          description: Include parameter
+      responses:
+        '200':
+          description: '`Success`'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/app__v4__schemes__invoices__InvoiceResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              example:
+                detail: Incorrect username or password
+        '404':
+          description: '`Failed` Invoice not found'
+        '410':
+          description: '`ERP unable to Finish`'
+        '412':
+          description: '`ERP Validation Error`'
+        '417':
+          description: '`ERP Unavailable`'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+        - invoices v4
+      summary: Cancel Proforma Invoice
+      description: Endpoint used for deleting invoice by payment reference ID
+      operationId: cancel_proforma_invoice_v4_invoices__payment_reference_id__delete
+      security:
+        - Basic HTTP Authentication: []
+      parameters:
+        - name: payment_reference_id
+          in: path
+          required: true
+          schema:
+            type: string
+            maxLength: 20
+            description: Variable Symbol
+            examples:
+              - '1234567890'
+            title: Payment Reference Id
+          description: Variable Symbol
+        - name: legal_entity
+          in: query
+          required: true
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/LegalEntity'
+            description: Legal entity
+            examples:
+              - HEG
+            title: Legal Entity
+          description: Legal entity
+      responses:
+        '204':
+          description: '`Success` Proforma invoice canceled'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              example:
+                detail: Incorrect username or password
+        '404':
+          description: '`Failed` Proforma invoice not found'
+        '410':
+          description: '`ERP unable to Finish`'
+        '412':
+          description: '`ERP Validation Error`'
+        '417':
+          description: '`ERP Unavailable`'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    head:
+      tags:
+        - invoices v4
+      summary: Check Pdf Availability
+      description: Endpoint used for checking the availability of this service
+      operationId: check_pdf_availability_v4_invoices__payment_reference_id__head
+      security:
+        - Basic HTTP Authentication: []
+      parameters:
+        - name: payment_reference_id
+          in: path
+          required: true
+          schema:
+            type: string
+            maxLength: 20
+            description: Variable Symbol
+            examples:
+              - '1234567890'
+            title: Payment Reference Id
+          description: Variable Symbol
+        - name: legal_entity
+          in: query
+          required: true
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/LegalEntity'
+            description: Legal entity
+            examples:
+              - HEG
+            title: Legal Entity
+          description: Legal entity
+        - name: invoice_type
+          in: query
+          required: false
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/DocumentType'
+            description: Type of invoice
+            examples:
+              - invoice
+            default: invoice
+            title: Invoice Type
+          description: Type of invoice
+      responses:
+        '200':
+          description: '`Success` PDF exists'
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              example:
+                detail: Incorrect username or password
+        '404':
+          description: '`Failed` PDF doesn''t exist'
+        '410':
+          description: '`ERP unable to Finish`'
+        '412':
+          description: '`ERP Validation Error`'
+        '417':
+          description: '`ERP Unavailable`'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v4/invoices:
+    get:
+      tags:
+        - invoices v4
+      summary: Get All Invoices
+      description: Endpoint used for getting all invoices for a customer
+      operationId: get_all_invoices_v4_invoices_get
+      security:
+        - Basic HTTP Authentication: []
+      parameters:
+        - name: customer_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+            description: Customer ID (UUID)
+            examples:
+              - 12345678-1234-5678-1234-567812345678
+            title: Customer Id
+          description: Customer ID (UUID)
+        - name: legal_entity
+          in: query
+          required: true
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/LegalEntity'
+            description: Legal entity
+            examples:
+              - HEG
+            title: Legal Entity
+          description: Legal entity
+        - name: invoice_type
+          in: query
+          required: false
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/DocumentType'
+            description: Type of invoice
+            examples:
+              - invoice
+            default: invoice
+            title: Invoice Type
+          description: Type of invoice
+      responses:
+        '200':
+          description: '`Success`'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/app__v4__schemes__invoices__InvoiceResponse'
+                title: Response Get All Invoices V4 Invoices Get
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              example:
+                detail: Incorrect username or password
+        '404':
+          description: '`Failed` Invoice not found'
+        '410':
+          description: '`ERP unable to Finish`'
+        '412':
+          description: '`ERP Validation Error`'
+        '417':
+          description: '`ERP Unavailable`'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      tags:
+        - invoices v4
+      summary: Create Invoice
+      description: Endpoint used for creating invoice
+      operationId: create_invoice_v4_invoices_post
+      security:
+        - Basic HTTP Authentication: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/app__v4__schemes__invoices__InvoiceRequest'
+      responses:
+        '201':
+          description: '`Success`'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/app__v4__schemes__invoices__InvoiceResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              example:
+                detail: Incorrect username or password
+        '404':
+          description: '`Failed` Invoice not found'
+        '410':
+          description: '`ERP unable to Finish`'
+        '412':
+          description: '`ERP Validation Error`'
+        '417':
+          description: '`ERP Unavailable`'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v4/customers/{customer_id}:
+    get:
+      tags:
+        - customers v4
+      summary: Get Customer
+      description: Get customer by customer ID
+      operationId: get_customer_v4_customers__customer_id__get
+      security:
+        - Basic HTTP Authentication: []
+      parameters:
+        - name: customer_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            description: Customer ID
+            title: Customer Id
+          description: Customer ID
+          example: 123e4567-e89b-12d3-a456-426614174000
+        - name: legal_entity
+          in: query
+          required: true
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/LegalEntity'
+            examples:
+              - HEG
+            title: Legal Entity
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/app__v4__schemes__customers__CustomerResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              example:
+                detail: Incorrect username or password
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v4/customers:
+    get:
+      tags:
+        - customers v4
+      summary: Get Customers
+      description: Get customers by identification number or array of customer IDs
+      operationId: get_customers_v4_customers_get
+      security:
+        - Basic HTTP Authentication: []
+      parameters:
+        - name: legal_entity
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/LegalEntity'
+          example: HEG
+        - name: identification_number
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+              - type: 'null'
+            title: Identification Number
+        - name: customer_ids
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: array
+                items:
+                  type: string
+                  format: uuid
+              - type: 'null'
+            description: Customer IDs array (UUID)
+            title: Customer Ids
+          description: Customer IDs array (UUID)
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/app__v4__schemes__customers__CustomerResponse'
+                title: Response Get Customers V4 Customers Get
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              example:
+                detail: Incorrect username or password
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      tags:
+        - customers v4
+      summary: Create Customer
+      description: Create a new customer
+      operationId: create_customer_v4_customers_post
+      security:
+        - Basic HTTP Authentication: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/app__v4__schemes__customers__CustomerRequest'
+      responses:
+        '201':
+          description: '`Success`'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/app__v4__schemes__customers__CustomerResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              example:
+                detail: Incorrect username or password
+        '404':
+          description: '`Failed` Cannot create customer'
+        '409':
+          description: '`Conflict` Customer already exists'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v4/partners/{identification_number}:
+    get:
+      tags:
+        - partners v4
+      summary: Get Partners
+      description: Get partners by identification number from Global Address Book
+      operationId: get_partners_v4_partners__identification_number__get
+      security:
+        - Basic HTTP Authentication: []
+      parameters:
+        - name: identification_number
+          in: path
+          required: true
+          schema:
+            type: string
+            description: Identification number
+            examples:
+              - '1234567908'
+            title: Identification Number
+          description: Identification number
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/app__v4__schemes__partners__PartnerResponse'
+                title: Response Get Partners V4 Partners  Identification Number  Get
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              example:
+                detail: Incorrect username or password
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /-/ping:
+    get:
+      tags:
+        - operations
+      summary: Get Ping
+      description: Endpoint used for checking the availability of this service
+      operationId: get_ping___ping_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /-/readiness:
+    get:
+      tags:
+        - operations
+      summary: Get Ping
+      description: Endpoint used for checking the availability of this service
+      operationId: get_ping___readiness_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /-/liveness:
+    get:
+      tags:
+        - operations
+      summary: Get Ping
+      description: Endpoint used for checking the availability of this service
+      operationId: get_ping___liveness_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+components:
+  schemas:
+    CountryCode3:
+      type: string
+      enum:
+        - AFG
+        - ALA
+        - ALB
+        - DZA
+        - ASM
+        - AND
+        - AGO
+        - AIA
+        - ATA
+        - ATG
+        - ARG
+        - ARM
+        - ABW
+        - AUS
+        - AUT
+        - AZE
+        - BHS
+        - BHR
+        - BGD
+        - BRB
+        - BLR
+        - BEL
+        - BLZ
+        - BEN
+        - BMU
+        - BTN
+        - BOL
+        - BES
+        - BIH
+        - BWA
+        - BVT
+        - BRA
+        - IOT
+        - BRN
+        - BGR
+        - BFA
+        - BDI
+        - CPV
+        - KHM
+        - CMR
+        - CAN
+        - CYM
+        - CAF
+        - TCD
+        - CHL
+        - CHN
+        - CXR
+        - CCK
+        - COL
+        - COM
+        - COG
+        - COD
+        - COK
+        - CRI
+        - CIV
+        - HRV
+        - CUB
+        - CUW
+        - CYP
+        - CZE
+        - DNK
+        - DJI
+        - DMA
+        - DOM
+        - ECU
+        - EGY
+        - SLV
+        - GNQ
+        - ERI
+        - EST
+        - ETH
+        - FLK
+        - FRO
+        - FJI
+        - FIN
+        - FRA
+        - GUF
+        - PYF
+        - ATF
+        - GAB
+        - GMB
+        - GEO
+        - DEU
+        - GHA
+        - GIB
+        - GRC
+        - GRL
+        - GRD
+        - GLP
+        - GUM
+        - GTM
+        - GGY
+        - GIN
+        - GNB
+        - GUY
+        - HTI
+        - HMD
+        - VAT
+        - HND
+        - HKG
+        - HUN
+        - ISL
+        - IND
+        - IDN
+        - IRN
+        - IRQ
+        - IRL
+        - IMN
+        - ISR
+        - ITA
+        - JAM
+        - JPN
+        - JEY
+        - JOR
+        - KAZ
+        - KEN
+        - KIR
+        - PRK
+        - KOR
+        - KWT
+        - KGZ
+        - LAO
+        - LVA
+        - LBN
+        - LSO
+        - LBR
+        - LBY
+        - LIE
+        - LTU
+        - LUX
+        - MAC
+        - MKD
+        - MDG
+        - MWI
+        - MYS
+        - MDV
+        - MLI
+        - MLT
+        - MHL
+        - MTQ
+        - MRT
+        - MUS
+        - MYT
+        - MEX
+        - FSM
+        - MDA
+        - MCO
+        - MNG
+        - MNE
+        - MSR
+        - MAR
+        - MOZ
+        - MMR
+        - NAM
+        - NRU
+        - NPL
+        - NLD
+        - NCL
+        - NZL
+        - NIC
+        - NER
+        - NGA
+        - NIU
+        - NFK
+        - MNP
+        - NOR
+        - OMN
+        - PAK
+        - PLW
+        - PSE
+        - PAN
+        - PNG
+        - PRY
+        - PER
+        - PHL
+        - PCN
+        - POL
+        - PRT
+        - PRI
+        - QAT
+        - REU
+        - ROU
+        - RUS
+        - RWA
+        - BLM
+        - SHN
+        - KNA
+        - LCA
+        - MAF
+        - SPM
+        - VCT
+        - WSM
+        - SMR
+        - STP
+        - SAU
+        - SEN
+        - SRB
+        - SYC
+        - SLE
+        - SGP
+        - SXM
+        - SVK
+        - SVN
+        - SLB
+        - SOM
+        - ZAF
+        - SGS
+        - SSD
+        - ESP
+        - LKA
+        - SDN
+        - SUR
+        - SJM
+        - SWZ
+        - SWE
+        - CHE
+        - SYR
+        - TWN
+        - TJK
+        - TZA
+        - THA
+        - TLS
+        - TGO
+        - TKL
+        - TON
+        - TTO
+        - TUN
+        - TUR
+        - TKM
+        - TCA
+        - TUV
+        - UGA
+        - UKR
+        - ARE
+        - GBR
+        - USA
+        - UMI
+        - URY
+        - UZB
+        - VUT
+        - VEN
+        - VNM
+        - VGB
+        - VIR
+        - WLF
+        - ESH
+        - YEM
+        - ZMB
+        - ZWE
+      title: CountryCode3
+      description: Provides available country codes in ISO 3166-1 alpha-3 format
+    Currency:
+      type: string
+      enum:
+        - BAM
+        - BGN
+        - CZK
+        - EUR
+        - HRK
+        - HUF
+        - RON
+        - RSD
+        - PLN
+        - PLN
+      title: Currency
+      description: |-
+        Provides available currency codes
+
+        BAM: Bosnia and Herzegovina convertible mark
+        BGN: Bulgarian lev
+        CZK: Czech koruna
+        EUR: Euro
+        HRK: Croatian kuna
+        HUF: Hungarian forint
+        RON: Romanian leu
+        RSD: Serbian dinar
+        PLZ: Polish zloty - PayU only accepts PLN on sandbox (pre-production) environment
+        SANDBOX: Polish zloty alias
+    DocumentType:
+      type: string
+      enum:
+        - invoice
+        - proforma
+      title: DocumentType
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    InvoiceItemResponse:
+      properties:
+        text:
+          type: string
+          title: Text
+          examples:
+            - Provize za sprostředkování objednávky na Heureka košík
+        amount:
+          type: string
+          title: Amount
+          examples:
+            - 10.5
+      type: object
+      required:
+        - text
+        - amount
+      title: InvoiceItemResponse
+    InvoiceKind:
+      type: string
+      enum:
+        - empty
+        - credit
+        - cancel
+      title: InvoiceKind
+    InvoiceListItem:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        invoiceNumber:
+          type: string
+          title: Invoicenumber
+        method:
+          $ref: '#/components/schemas/PaymentMethod'
+        documentDate:
+          type: string
+          format: date-time
+          title: Documentdate
+        dueDate:
+          type: string
+          format: date-time
+          title: Duedate
+        paidDate:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          title: Paiddate
+        amount:
+          type: string
+          title: Amount
+        amountVat:
+          type: string
+          title: Amountvat
+        currency:
+          $ref: '#/components/schemas/Currency'
+        customerId:
+          type: string
+          format: uuid
+          title: Customerid
+        paymentStatus:
+          $ref: '#/components/schemas/PaymentStatus'
+        availableTypes:
+          items:
+            $ref: '#/components/schemas/InvoiceType'
+          type: array
+          uniqueItems: true
+          title: Availabletypes
+      type: object
+      required:
+        - id
+        - invoiceNumber
+        - method
+        - documentDate
+        - dueDate
+        - paidDate
+        - amount
+        - amountVat
+        - currency
+        - customerId
+        - paymentStatus
+        - availableTypes
+      title: InvoiceListItem
+    InvoiceType:
+      type: string
+      enum:
+        - invoice
+        - proforma
+      title: InvoiceType
+    LegalEntity:
+      type: string
+      enum:
+        - HEG
+        - HEF
+        - OCS
+        - CEN
+        - SMI
+        - DTW
+        - BBT
+      title: LegalEntity
+    Order:
+      type: string
+      enum:
+        - asc
+        - desc
+      title: Order
+    Pagination:
+      properties:
+        page:
+          type: integer
+          minimum: 1
+          title: Page
+          description: Page number
+          examples:
+            - 1
+        pageSize:
+          type: integer
+          minimum: 1
+          title: Pagesize
+          description: Page size
+          examples:
+            - 10
+        totalPages:
+          type: integer
+          minimum: 0
+          title: Totalpages
+          description: Total pages
+        totalItems:
+          type: integer
+          minimum: 0
+          title: Totalitems
+          description: Total items
+      type: object
+      required:
+        - page
+        - pageSize
+        - totalPages
+        - totalItems
+      title: Pagination
+    PaymentMethod:
+      type: string
+      enum:
+        - autopay
+        - credit_card
+        - bank_transfer
+        - pay_by_link
+        - backward_invoicing
+        - marketplace
+        - adyen
+        - other
+      title: PaymentMethod
+    PaymentStatus:
+      type: string
+      enum:
+        - paid
+        - partially
+        - unpaid
+      title: PaymentStatus
+    PaymentType:
+      type: string
+      enum:
+        - autopay
+        - manual
+        - paybylink
+        - banktransfer
+        - backwardinvoicing
+        - shoppingcart
+        - adyen
+        - other
+      title: PaymentType
+    Sorting:
+      properties:
+        sortBy:
+          type: string
+          title: Sortby
+          description: Sort by
+        sortOrder:
+          allOf:
+            - $ref: '#/components/schemas/Order'
+          description: Sort order
+      type: object
+      required:
+        - sortBy
+        - sortOrder
+      title: Sorting
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+              - type: string
+              - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+        - loc
+        - msg
+        - type
+      title: ValidationError
+    app__common__schemes__base__TableResponse_InvoiceListItem_InvoiceListFilters___1:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/InvoiceListItem'
+          type: array
+          title: Items
+          description: Content
+        pagination:
+          allOf:
+            - $ref: '#/components/schemas/Pagination'
+          description: Pagination
+        sorting:
+          allOf:
+            - $ref: '#/components/schemas/Sorting'
+          description: Sorting
+        filters:
+          allOf:
+            - $ref: '#/components/schemas/app__v3__schemes__invoices__InvoiceListFilters'
+          description: Additional Filters
+      type: object
+      required:
+        - items
+        - pagination
+        - sorting
+        - filters
+      title: TableResponse[InvoiceListItem, InvoiceListFilters]
+    app__common__schemes__base__TableResponse_InvoiceListItem_InvoiceListFilters___2:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/InvoiceListItem'
+          type: array
+          title: Items
+          description: Content
+        pagination:
+          allOf:
+            - $ref: '#/components/schemas/Pagination'
+          description: Pagination
+        sorting:
+          allOf:
+            - $ref: '#/components/schemas/Sorting'
+          description: Sorting
+        filters:
+          allOf:
+            - $ref: '#/components/schemas/app__v4__schemes__invoices__InvoiceListFilters'
+          description: Additional Filters
+      type: object
+      required:
+        - items
+        - pagination
+        - sorting
+        - filters
+      title: TableResponse[InvoiceListItem, InvoiceListFilters]
+    app__v3__schemes__customers__CustomerRequest:
+      properties:
+        legalEntity:
+          allOf:
+            - $ref: '#/components/schemas/LegalEntity'
+          description: Legal Entity
+          examples:
+            - HEG
+        name:
+          type: string
+          title: Name
+          description: Name of the customers company.
+          examples:
+            - Customer & Co.
+        identificationNumber:
+          type: string
+          title: Identificationnumber
+          description: Identification number of the customer
+          examples:
+            - '123456789'
+        vatNumber:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Vatnumber
+          description: VAT number of the customer
+          examples:
+            - CZ123456789
+        vatIdentificationNumber:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Vatidentificationnumber
+          description: Slovak IC DIC
+          examples:
+            - SK1234567890
+        generalTaxId:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Generaltaxid
+          description: TIN - Taxpayer Identification Number
+          examples:
+            - '123456789'
+            - 12345678-1-12
+        street:
+          type: string
+          title: Street
+          description: Street from the customers address.
+          examples:
+            - Pražská 1/123
+        city:
+          type: string
+          title: City
+          description: City from the customers address.
+          examples:
+            - Praha
+        postCode:
+          type: string
+          title: Postcode
+          description: Post code from the customers address.
+          examples:
+            - '20100'
+        countryCode:
+          allOf:
+            - $ref: '#/components/schemas/CountryCode3'
+          description: Country code in ISO 3166-1 alpha-3 format.
+          examples:
+            - CZE
+        telephone:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Telephone
+          description: Customers telephone number with country prefix.
+          examples:
+            - '+420123456789'
+        email:
+          type: string
+          format: email
+          title: Email
+          description: Customers e-mail address
+          examples:
+            - customer@company.com
+        partyId:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Partyid
+          description: Optional value that is filled only when is there any partner in Global Address Book with the same identificationNumber.
+          default: ''
+          examples:
+            - '0011223344'
+      type: object
+      required:
+        - legalEntity
+        - name
+        - identificationNumber
+        - street
+        - city
+        - postCode
+        - countryCode
+        - email
+      title: CustomerRequest
+      description: Model of Customer object for input
+    app__v3__schemes__customers__CustomerResponse:
+      properties:
+        legalEntity:
+          allOf:
+            - $ref: '#/components/schemas/LegalEntity'
+          description: Legal Entity
+          examples:
+            - HEG
+        name:
+          type: string
+          title: Name
+          description: Name of the customers company.
+          examples:
+            - Customer & Co.
+        identificationNumber:
+          type: string
+          title: Identificationnumber
+          description: Identification number of the customer
+          examples:
+            - '123456789'
+        vatNumber:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Vatnumber
+          description: VAT number of the customer
+          examples:
+            - CZ123456789
+        vatIdentificationNumber:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Vatidentificationnumber
+          description: Slovak IC DIC
+          examples:
+            - SK1234567890
+        generalTaxId:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Generaltaxid
+          description: TIN - Taxpayer Identification Number
+          examples:
+            - '123456789'
+            - 12345678-1-12
+        street:
+          type: string
+          title: Street
+          description: Street from the customers address.
+          examples:
+            - Pražská 1/123
+        city:
+          type: string
+          title: City
+          description: City from the customers address.
+          examples:
+            - Praha
+        postCode:
+          type: string
+          title: Postcode
+          description: Post code from the customers address.
+          examples:
+            - '20100'
+        countryCode:
+          allOf:
+            - $ref: '#/components/schemas/CountryCode3'
+          description: Country code in ISO 3166-1 alpha-3 format.
+          examples:
+            - CZE
+        telephone:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Telephone
+          description: Customers telephone number with country prefix.
+          examples:
+            - '+420123456789'
+        email:
+          type: string
+          format: email
+          title: Email
+          description: Customers e-mail address
+          examples:
+            - customer@company.com
+        customerId:
+          type: string
+          format: uuid
+          title: Customerid
+          examples:
+            - 7a756aea-3975-418a-83a7-7ab4894c72c3
+        isActive:
+          type: boolean
+          title: Isactive
+          examples:
+            - true
+        includeVAT:
+          anyOf:
+            - type: boolean
+            - type: 'null'
+          title: Includevat
+          description: Indicates whether the customer is a VAT payer or not.
+          default: false
+        taxRate:
+          anyOf:
+            - type: number
+            - type: 'null'
+          title: Taxrate
+          description: This value returns the tax rate value, according to the includeVat attribute and the specific Legal Entity.
+          default: 0
+      type: object
+      required:
+        - legalEntity
+        - name
+        - identificationNumber
+        - street
+        - city
+        - postCode
+        - countryCode
+        - email
+        - customerId
+        - isActive
+      title: CustomerResponse
+      description: Model of Customer object for output
+    app__v3__schemes__invoices__InvoiceItemRequest:
+      properties:
+        text:
+          type: string
+          title: Text
+          examples:
+            - Provize za sprostředkování objednávky na Heureka košík
+        amount:
+          anyOf:
+            - type: number
+            - type: string
+          title: Amount
+          examples:
+            - 10.5
+        unit:
+          type: integer
+          title: Unit
+          description: Number of the amounts for the same item (It can be higher or less than zero)
+          examples:
+            - 1
+        aProfitCenter:
+          anyOf:
+            - $ref: '#/components/schemas/CountryCode3'
+            - type: 'null'
+          description: If the element is empty, then it will be found in 'Integration settings' according to rest API = 'type/countryCode'
+          examples:
+            - CZE
+        lineNote:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Linenote
+          description: Note text field size is not limited, we recommend a maximum of 250 characters
+          examples:
+            - Note for the line
+        itemType:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Itemtype
+          description: PPC/H204/etc...
+        itemVatGroup:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Itemvatgroup
+          description: VAT group of the item
+          examples:
+            - DEF27
+        discount:
+          anyOf:
+            - type: number
+            - type: string
+            - type: 'null'
+          title: Discount
+          description: Discount in a range between 0.00 to 100.00%. Example 12.24
+          examples:
+            - 10.5
+        grossAmount:
+          anyOf:
+            - type: number
+            - type: string
+            - type: 'null'
+          title: Grossamount
+          description: The total amount of the line before discount
+          examples:
+            - 120.1
+      type: object
+      required:
+        - text
+        - amount
+        - unit
+      title: InvoiceItemRequest
+    app__v3__schemes__invoices__InvoiceListFilters:
+      properties:
+        dateFrom:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          title: Datefrom
+        dateTo:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          title: Dateto
+      type: object
+      title: InvoiceListFilters
+    app__v3__schemes__invoices__InvoiceRequest:
+      properties:
+        legalEntity:
+          allOf:
+            - $ref: '#/components/schemas/LegalEntity'
+          examples:
+            - HEG
+        paymentReferenceId:
+          anyOf:
+            - type: string
+              maxLength: 20
+            - type: 'null'
+          title: Paymentreferenceid
+          examples:
+            - '1100000005'
+        currency:
+          allOf:
+            - $ref: '#/components/schemas/Currency'
+          examples:
+            - CZK
+        countryCode:
+          allOf:
+            - $ref: '#/components/schemas/CountryCode3'
+          examples:
+            - CZE
+        paymentType:
+          allOf:
+            - $ref: '#/components/schemas/PaymentType'
+          examples:
+            - autopay
+        customerId:
+          type: string
+          format: uuid
+          title: Customerid
+          examples:
+            - 79d0db17-ce68-4bb0-88be-aec761e28395
+        accountingDate:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          title: Accountingdate
+          description: ISO 8601
+          examples:
+            - '2021-06-28T19:44:37Z'
+        vatDate:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          title: Vatdate
+          description: ISO 8601
+          examples:
+            - '2021-06-28T19:44:37Z'
+        documentDate:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          title: Documentdate
+          description: ISO 8601
+          examples:
+            - '2021-06-28T19:44:37Z'
+        dueDate:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          title: Duedate
+          description: ISO 8601
+          examples:
+            - '2021-06-30T19:44:37Z'
+        originalInvoiceNr:
+          anyOf:
+            - type: string
+              maxLength: 20
+            - type: 'null'
+          title: Originalinvoicenr
+          examples:
+            - '202020'
+        invoiceType:
+          allOf:
+            - $ref: '#/components/schemas/InvoiceKind'
+          examples:
+            - credit
+        shopId:
+          anyOf:
+            - type: string
+              maxLength: 30
+            - type: 'null'
+          title: Shopid
+          examples:
+            - '123'
+        invoiceNote:
+          type: string
+          title: Invoicenote
+          examples:
+            - Invoice Note
+        customerOrderNr:
+          type: string
+          maxLength: 20
+          title: Customerordernr
+          examples:
+            - Invoice Note
+        items:
+          items:
+            $ref: '#/components/schemas/app__v3__schemes__invoices__InvoiceItemRequest'
+          type: array
+          title: Items
+      type: object
+      required:
+        - legalEntity
+        - currency
+        - countryCode
+        - paymentType
+        - customerId
+        - invoiceType
+        - invoiceNote
+        - customerOrderNr
+        - items
+      title: InvoiceRequest
+    app__v3__schemes__invoices__InvoiceResponse:
+      properties:
+        legalEntity:
+          allOf:
+            - $ref: '#/components/schemas/LegalEntity'
+          examples:
+            - HEG
+        paymentReferenceId:
+          anyOf:
+            - type: string
+              maxLength: 20
+            - type: 'null'
+          title: Paymentreferenceid
+          examples:
+            - '1100000005'
+        currency:
+          allOf:
+            - $ref: '#/components/schemas/Currency'
+          examples:
+            - CZK
+        countryCode:
+          allOf:
+            - $ref: '#/components/schemas/CountryCode3'
+          examples:
+            - CZE
+        paymentType:
+          anyOf:
+            - $ref: '#/components/schemas/PaymentType'
+            - type: 'null'
+          examples:
+            - autopay
+        customerId:
+          type: string
+          format: uuid
+          title: Customerid
+          examples:
+            - 79d0db17-ce68-4bb0-88be-aec761e28395
+        accountingDate:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          title: Accountingdate
+          description: ISO 8601
+          examples:
+            - '2021-06-28T19:44:37Z'
+        vatDate:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          title: Vatdate
+          description: ISO 8601
+          examples:
+            - '2021-06-28T19:44:37Z'
+        documentDate:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          title: Documentdate
+          description: ISO 8601
+          examples:
+            - '2021-06-28T19:44:37Z'
+        dueDate:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          title: Duedate
+          description: ISO 8601
+          examples:
+            - '2021-06-30T19:44:37Z'
+        originalInvoiceNr:
+          anyOf:
+            - type: string
+              maxLength: 20
+            - type: 'null'
+          title: Originalinvoicenr
+          examples:
+            - '202020'
+        invoiceType:
+          anyOf:
+            - $ref: '#/components/schemas/InvoiceKind'
+            - type: 'null'
+          examples:
+            - credit
+        shopId:
+          anyOf:
+            - type: string
+              maxLength: 30
+            - type: 'null'
+          title: Shopid
+          examples:
+            - string
+        amount:
+          type: string
+          title: Amount
+          examples:
+            - 10.5
+        amountVat:
+          type: string
+          title: Amountvat
+          examples:
+            - 12.5
+        amountToPay:
+          type: string
+          title: Amounttopay
+          examples:
+            - 8
+        status:
+          allOf:
+            - $ref: '#/components/schemas/PaymentStatus'
+          examples:
+            - paid
+        pdf:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Pdf
+          examples:
+            - cGRmIGRhdGEgb2YgaW52b2ljZQ==
+        items:
+          items:
+            $ref: '#/components/schemas/InvoiceItemResponse'
+          type: array
+          title: Items
+      type: object
+      required:
+        - legalEntity
+        - currency
+        - countryCode
+        - customerId
+        - amount
+        - amountVat
+        - amountToPay
+        - status
+        - items
+      title: InvoiceResponse
+    app__v3__schemes__partners__PartnerResponse:
+      properties:
+        partyId:
+          type: string
+          title: Partyid
+          description: Optional value that is filled only when is there any partner in Global Address Book with the same identificationNumber.
+          default: ''
+          examples:
+            - '0011223344'
+        name:
+          type: string
+          title: Name
+          description: Name of the customers company.
+          examples:
+            - Prvni vzduchoplavecka a.s.
+        identificationNumber:
+          type: string
+          title: Identificationnumber
+          description: Identification number of the customer
+          examples:
+            - '123456789'
+        vatNumber:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Vatnumber
+          description: VAT number of the customer
+          examples:
+            - '10000001'
+        vatIdentificationNumber:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Vatidentificationnumber
+          description: Slovak IC DIC
+          examples:
+            - '10000001'
+        street:
+          type: string
+          title: Street
+          description: Street from the customers address.
+          examples:
+            - U plynojemu 69
+        city:
+          type: string
+          title: City
+          description: City from the customers address.
+          examples:
+            - Pardubice
+        postCode:
+          type: string
+          title: Postcode
+          description: Post code from the customers address.
+          examples:
+            - '32000'
+        countryCode:
+          allOf:
+            - $ref: '#/components/schemas/CountryCode3'
+          examples:
+            - CZE
+        isActive:
+          type: boolean
+          title: Isactive
+          examples:
+            - true
+      type: object
+      required:
+        - name
+        - identificationNumber
+        - street
+        - city
+        - postCode
+        - countryCode
+        - isActive
+      title: PartnerResponse
+    app__v3__utils__enums__AllowedInvoiceListAttributes:
+      type: string
+      enum:
+        - invoice_number
+        - document_date
+        - due_date
+        - amount
+      title: AllowedInvoiceListAttributes
+    app__v4__schemes__customers__CustomerRequest:
+      properties:
+        legalEntity:
+          allOf:
+            - $ref: '#/components/schemas/LegalEntity'
+          description: Legal Entity
+          examples:
+            - HEG
+        name:
+          type: string
+          title: Name
+          description: Name of the customers company.
+          examples:
+            - Customer & Co.
+        identificationNumber:
+          type: string
+          title: Identificationnumber
+          description: Identification number of the customer
+          examples:
+            - '123456789'
+        vatNumber:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Vatnumber
+          description: VAT number of the customer
+          examples:
+            - CZ123456789
+        vatIdentificationNumber:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Vatidentificationnumber
+          description: Slovak IC DIC
+          examples:
+            - SK1234567890
+        generalTaxId:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Generaltaxid
+          description: TIN - Taxpayer Identification Number
+          examples:
+            - '123456789'
+            - 12345678-1-12
+        countryCode:
+          allOf:
+            - $ref: '#/components/schemas/CountryCode3'
+          description: Country code in ISO 3166-1 alpha-3 format.
+          examples:
+            - CZE
+        street:
+          type: string
+          title: Street
+          description: Street from the customers address.
+          examples:
+            - Pražská 1/123
+        city:
+          type: string
+          title: City
+          description: City from the customers address.
+          examples:
+            - Praha
+        postalCode:
+          type: string
+          title: Postalcode
+          description: Post code from the customers address.
+          examples:
+            - '20100'
+        phone:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Phone
+          description: Customers telephone number with country prefix.
+          examples:
+            - '+420123456789'
+        email:
+          type: string
+          format: email
+          title: Email
+          description: Customers e-mail address
+          examples:
+            - customer@company.com
+        partnerId:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Partnerid
+          description: Optional value that is filled only when is there any partner in Global Address Book with the same identificationNumber.
+          default: ''
+          examples:
+            - '0011223344'
+      type: object
+      required:
+        - legalEntity
+        - name
+        - identificationNumber
+        - countryCode
+        - street
+        - city
+        - postalCode
+        - email
+      title: CustomerRequest
+      description: Model of Customer object for input
+    app__v4__schemes__customers__CustomerResponse:
+      properties:
+        legalEntity:
+          allOf:
+            - $ref: '#/components/schemas/LegalEntity'
+          description: Legal Entity
+          examples:
+            - HEG
+        name:
+          type: string
+          title: Name
+          description: Name of the customers company.
+          examples:
+            - Customer & Co.
+        identificationNumber:
+          type: string
+          title: Identificationnumber
+          description: Identification number of the customer
+          examples:
+            - '123456789'
+        vatNumber:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Vatnumber
+          description: VAT number of the customer
+          examples:
+            - CZ123456789
+        vatIdentificationNumber:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Vatidentificationnumber
+          description: Slovak IC DIC
+          examples:
+            - SK1234567890
+        generalTaxId:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Generaltaxid
+          description: TIN - Taxpayer Identification Number
+          examples:
+            - '123456789'
+            - 12345678-1-12
+        countryCode:
+          allOf:
+            - $ref: '#/components/schemas/CountryCode3'
+          description: Country code in ISO 3166-1 alpha-3 format.
+          examples:
+            - CZE
+        street:
+          type: string
+          title: Street
+          description: Street from the customers address.
+          examples:
+            - Pražská 1/123
+        city:
+          type: string
+          title: City
+          description: City from the customers address.
+          examples:
+            - Praha
+        postalCode:
+          type: string
+          title: Postalcode
+          description: Post code from the customers address.
+          examples:
+            - '20100'
+        phone:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Phone
+          description: Customers telephone number with country prefix.
+          examples:
+            - '+420123456789'
+        email:
+          type: string
+          format: email
+          title: Email
+          description: Customers e-mail address
+          examples:
+            - customer@company.com
+        customerId:
+          type: string
+          format: uuid
+          title: Customerid
+          examples:
+            - 7a756aea-3975-418a-83a7-7ab4894c72c3
+        isActive:
+          type: boolean
+          title: Isactive
+          examples:
+            - true
+        includeVAT:
+          anyOf:
+            - type: boolean
+            - type: 'null'
+          title: Includevat
+          description: Indicates whether the customer is a VAT payer or not.
+          default: false
+        taxRate:
+          anyOf:
+            - type: number
+            - type: 'null'
+          title: Taxrate
+          description: This value returns the tax rate value, according to the includeVat attribute and the specific Legal Entity.
+          default: 0
+      type: object
+      required:
+        - legalEntity
+        - name
+        - identificationNumber
+        - countryCode
+        - street
+        - city
+        - postalCode
+        - email
+        - customerId
+        - isActive
+      title: CustomerResponse
+      description: Model of Customer object for output
+    app__v4__schemes__invoices__InvoiceItemRequest:
+      properties:
+        text:
+          type: string
+          title: Text
+          examples:
+            - Provize za sprostředkování objednávky na Heureka košík
+        amount:
+          anyOf:
+            - type: number
+            - type: string
+          title: Amount
+          examples:
+            - 10.5
+        unit:
+          type: integer
+          title: Unit
+          description: Number of the amounts for the same item (It can be higher or less than zero)
+          examples:
+            - 1
+        profitCenter:
+          allOf:
+            - $ref: '#/components/schemas/CountryCode3'
+          description: If the element is empty, then it will be found in 'Integration settings' according to rest API = 'type/countryCode'
+          examples:
+            - CZE
+        note:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Note
+          description: Note text field size is not limited, we recommend a maximum of 250 characters
+          examples:
+            - Note for the line
+        type:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Type
+          description: PPC/H204/etc...
+        vatGroup:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Vatgroup
+          description: VAT group of the item
+          examples:
+            - DEF27
+        discount:
+          anyOf:
+            - type: number
+            - type: string
+            - type: 'null'
+          title: Discount
+          description: Discount in a range between 0.00 to 100.00%. Example 12.24
+          examples:
+            - 10.5
+        grossAmount:
+          anyOf:
+            - type: number
+            - type: string
+            - type: 'null'
+          title: Grossamount
+          description: The total amount of the line before discount
+          examples:
+            - 120.1
+      type: object
+      required:
+        - text
+        - amount
+        - unit
+        - profitCenter
+      title: InvoiceItemRequest
+    app__v4__schemes__invoices__InvoiceListFilters:
+      properties:
+        dateIssueFrom:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          title: Dateissuefrom
+        dateIssueTo:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          title: Dateissueto
+        datePaidFrom:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          title: Datepaidfrom
+        datePaidTo:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          title: Datepaidto
+        customerId:
+          anyOf:
+            - type: string
+              format: uuid
+            - type: 'null'
+          title: Customerid
+        invoiceNumber:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Invoicenumber
+      type: object
+      title: InvoiceListFilters
+    app__v4__schemes__invoices__InvoiceRequest:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        legalEntity:
+          allOf:
+            - $ref: '#/components/schemas/LegalEntity'
+          examples:
+            - HEG
+        paymentReferenceId:
+          anyOf:
+            - type: string
+              maxLength: 20
+            - type: 'null'
+          title: Paymentreferenceid
+          examples:
+            - '1100000005'
+        currency:
+          allOf:
+            - $ref: '#/components/schemas/Currency'
+          examples:
+            - CZK
+        countryCode:
+          allOf:
+            - $ref: '#/components/schemas/CountryCode3'
+          examples:
+            - CZE
+        paymentType:
+          allOf:
+            - $ref: '#/components/schemas/PaymentType'
+          examples:
+            - autopay
+        customerId:
+          type: string
+          format: uuid
+          title: Customerid
+          examples:
+            - 79d0db17-ce68-4bb0-88be-aec761e28395
+        accountingDate:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          title: Accountingdate
+          description: ISO 8601
+          examples:
+            - '2021-06-28T19:44:37Z'
+        vatDate:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          title: Vatdate
+          description: ISO 8601
+          examples:
+            - '2021-06-28T19:44:37Z'
+        documentDate:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          title: Documentdate
+          description: ISO 8601
+          examples:
+            - '2021-06-28T19:44:37Z'
+        dueDate:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          title: Duedate
+          description: ISO 8601
+          examples:
+            - '2021-06-30T19:44:37Z'
+        originalInvoiceNumber:
+          anyOf:
+            - type: string
+              maxLength: 20
+            - type: 'null'
+          title: Originalinvoicenumber
+          examples:
+            - '202020'
+        type:
+          allOf:
+            - $ref: '#/components/schemas/InvoiceKind'
+          examples:
+            - credit
+        shopId:
+          anyOf:
+            - type: string
+              maxLength: 30
+            - type: 'null'
+          title: Shopid
+          examples:
+            - '123'
+        note:
+          type: string
+          title: Note
+          examples:
+            - Invoice Note
+        customerOrderNumber:
+          type: string
+          maxLength: 20
+          title: Customerordernumber
+          examples:
+            - Invoice Note
+        items:
+          items:
+            $ref: '#/components/schemas/app__v4__schemes__invoices__InvoiceItemRequest'
+          type: array
+          title: Items
+      type: object
+      required:
+        - id
+        - legalEntity
+        - currency
+        - countryCode
+        - paymentType
+        - customerId
+        - type
+        - note
+        - customerOrderNumber
+        - items
+      title: InvoiceRequest
+    app__v4__schemes__invoices__InvoiceResponse:
+      properties:
+        legalEntity:
+          allOf:
+            - $ref: '#/components/schemas/LegalEntity'
+          examples:
+            - HEG
+        paymentReferenceId:
+          anyOf:
+            - type: string
+              maxLength: 20
+            - type: 'null'
+          title: Paymentreferenceid
+          examples:
+            - '1100000005'
+        currency:
+          allOf:
+            - $ref: '#/components/schemas/Currency'
+          examples:
+            - CZK
+        countryCode:
+          allOf:
+            - $ref: '#/components/schemas/CountryCode3'
+          examples:
+            - CZE
+        paymentType:
+          anyOf:
+            - $ref: '#/components/schemas/PaymentType'
+            - type: 'null'
+          examples:
+            - autopay
+        customerId:
+          type: string
+          format: uuid
+          title: Customerid
+          examples:
+            - 79d0db17-ce68-4bb0-88be-aec761e28395
+        accountingDate:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          title: Accountingdate
+          description: ISO 8601
+          examples:
+            - '2021-06-28T19:44:37Z'
+        vatDate:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          title: Vatdate
+          description: ISO 8601
+          examples:
+            - '2021-06-28T19:44:37Z'
+        documentDate:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          title: Documentdate
+          description: ISO 8601
+          examples:
+            - '2021-06-28T19:44:37Z'
+        dueDate:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          title: Duedate
+          description: ISO 8601
+          examples:
+            - '2021-06-30T19:44:37Z'
+        originalInvoiceNumber:
+          anyOf:
+            - type: string
+              maxLength: 20
+            - type: 'null'
+          title: Originalinvoicenumber
+          examples:
+            - '202020'
+        type:
+          anyOf:
+            - $ref: '#/components/schemas/InvoiceKind'
+            - type: 'null'
+          examples:
+            - credit
+        shopId:
+          anyOf:
+            - type: string
+              maxLength: 30
+            - type: 'null'
+          title: Shopid
+          examples:
+            - string
+        amount:
+          type: string
+          title: Amount
+          examples:
+            - 10.5
+        amountVat:
+          type: string
+          title: Amountvat
+          examples:
+            - 12.5
+        amountToPay:
+          type: string
+          title: Amounttopay
+          examples:
+            - 8
+        status:
+          allOf:
+            - $ref: '#/components/schemas/PaymentStatus'
+          examples:
+            - paid
+        pdf:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Pdf
+          examples:
+            - cGRmIGRhdGEgb2YgaW52b2ljZQ==
+        items:
+          items:
+            $ref: '#/components/schemas/InvoiceItemResponse'
+          type: array
+          title: Items
+      type: object
+      required:
+        - legalEntity
+        - currency
+        - countryCode
+        - customerId
+        - amount
+        - amountVat
+        - amountToPay
+        - status
+        - items
+      title: InvoiceResponse
+    app__v4__schemes__partners__PartnerResponse:
+      properties:
+        partnerId:
+          type: string
+          title: Partnerid
+          description: Optional value that is filled only when is there any partner in Global Address Book with the same identificationNumber.
+          default: ''
+          examples:
+            - '0011223344'
+        name:
+          type: string
+          title: Name
+          description: Name of the customers company.
+          examples:
+            - Prvni vzduchoplavecka a.s.
+        identificationNumber:
+          type: string
+          title: Identificationnumber
+          description: Identification number of the customer
+          examples:
+            - '123456789'
+        vatNumber:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Vatnumber
+          description: VAT number of the customer
+          examples:
+            - '10000001'
+        vatIdentificationNumber:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Vatidentificationnumber
+          description: Slovak IC DIC
+          examples:
+            - '10000001'
+        street:
+          type: string
+          title: Street
+          description: Street from the customers address.
+          examples:
+            - U plynojemu 69
+        city:
+          type: string
+          title: City
+          description: City from the customers address.
+          examples:
+            - Pardubice
+        postalCode:
+          type: string
+          title: Postalcode
+          description: Post code from the customers address.
+          examples:
+            - '32000'
+        countryCode:
+          allOf:
+            - $ref: '#/components/schemas/CountryCode3'
+          examples:
+            - CZE
+        isActive:
+          type: boolean
+          title: Isactive
+          examples:
+            - true
+      type: object
+      required:
+        - name
+        - identificationNumber
+        - street
+        - city
+        - postalCode
+        - countryCode
+        - isActive
+      title: PartnerResponse
+    app__v4__utils__enums__AllowedInvoiceListAttributes:
+      type: string
+      enum:
+        - invoiceNumber
+        - documentDate
+        - dueDate
+        - amount
+      title: AllowedInvoiceListAttributes
+  securitySchemes:
+    Basic HTTP Authentication:
+      type: http
+      description: '**base64** of ''{*username*}:{*password*}'''
+      scheme: basic
+tags:
+  - name: operations
+    description: Operational endpoints used mainly by K8S
+  - name: invoices v4
+    description: Invoicing endpoints and their creation
+  - name: customers v4
+    description: Customer endpoints and their creation
+  - name: partners v4
+    description: Partner endpoints and their creation
+  - name: invoices v3
+    description: Invoicing endpoints and their creation
+  - name: customers v3
+    description: Customer endpoints and their creation
+  - name: partners v3
+    description: Partner endpoints and their creation
